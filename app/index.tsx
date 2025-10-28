@@ -11,7 +11,7 @@ export default function Index() {
       router.replace("./manager"); // navighează la Manager
     } else if (username === "department" && password === "department") {
       router.replace("./DepBoss"); // navighează la Șef Departament
-    } 
+    }
     else if (username === "worker" && password === "worker") {
       router.replace("./WorkerPage"); // navighează la Șef Departament
     } else {

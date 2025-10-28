@@ -33,7 +33,9 @@ export default function Layout() {
   if (!loggedIn) {
     // dacă nu e logat, redirectăm la login
 
-    return null; // nu afișăm încă Slot
+    // Render the Slot so the index/login page can show instead of a blank screen.
+    // Previously this returned `null` which causes a blank page in web builds.
+    return <Slot />;
   }
 
   return <Slot />; // afișăm pagina principală pentru user logat

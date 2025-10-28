@@ -21,7 +21,9 @@ import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProjectPage(): React.ReactElement {
-  const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const rawId = params.id;
+  const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
   type Task = {
     name: string;
@@ -32,6 +34,8 @@ export default function ProjectPage(): React.ReactElement {
     done?: boolean;
     progress?: number;
     id?: string;
+    startDate?: string;
+    cost?: number;
   };
 
   type Project = {
@@ -39,6 +43,7 @@ export default function ProjectPage(): React.ReactElement {
     name: string;
     description: string;
     deadline?: string;
+    budget?: number;
   };
 
   const existing: Project | null = null;
@@ -68,10 +73,14 @@ export default function ProjectPage(): React.ReactElement {
     departments: [],
     color: "",
     deadline: "",
+    startDate: "",
     createdAt: dayjs().format("YYYY-MM-DD"),
     done: false,
     progress: 0,
   });
+
+  const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
+  const [showEditStartDateCalendar, setShowEditStartDateCalendar] = useState(false);
 
   const [editData, setEditData] = useState<{ name: string; description: string; deadline?: string }>(
     {
@@ -80,6 +89,9 @@ export default function ProjectPage(): React.ReactElement {
       deadline: project?.deadline ?? "",
     }
   );
+
+  // allow editing budget via edit modal
+  const [editBudget, setEditBudget] = useState<string>(String(project?.budget ?? ""));
 
   // Keep editData.deadline in sync with project.deadline (e.g. when saved elsewhere)
   useEffect(() => {
@@ -165,7 +177,8 @@ export default function ProjectPage(): React.ReactElement {
   // === ADD TASK ===
   function addTask() {
     if (!taskData.name) return setWarning("Please enter a task name.");
-    if (!taskData.deadline) return setWarning("Please select a deadline.");
+    // require a start date instead of forcing a calendar deadline
+    if (!taskData.startDate) return setWarning("Please enter a start date for the task.");
     if (taskData.departments.length === 0) return setWarning("Please select at least one department.");
 
     // Pick a color based on the first selected department
@@ -179,6 +192,8 @@ export default function ProjectPage(): React.ReactElement {
       // ensure every task has an id for referencing
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}` as unknown as any,
       progress: taskData.progress ?? 0,
+      startDate: taskData.startDate,
+      cost: taskData.cost ?? 0,
     };
 
     setTasks((prev) => [...prev, newTask]);
@@ -248,7 +263,9 @@ export default function ProjectPage(): React.ReactElement {
       setWarning("Project name cannot be empty.");
       return;
     }
-    const updated = { ...project, ...editData };
+    // include budget if provided
+    const parsedBudget = Number(editBudget ? editBudget.toString().replace(/[^0-9.]/g, "") : 0) || 0;
+    const updated = { ...project, ...editData, budget: parsedBudget };
     setProject(updated);
     try {
       const payload = encodeURIComponent(JSON.stringify(updated));
@@ -259,6 +276,13 @@ export default function ProjectPage(): React.ReactElement {
     setEditModalVisible(false);
   }
 
+  // Derived data for chart and budget
+  const overallProgress = tasks.length ? Math.round(tasks.reduce((a, t) => a + (t.progress ?? 0), 0) / tasks.length) : 0;
+  const totalBudget = project?.budget ?? 0;
+  const spent = tasks.reduce((a, t) => a + (t.cost ?? 0), 0);
+  const remaining = Math.max(0, totalBudget - spent);
+  const sumProgressSegments = tasks.reduce((a, t) => a + (t.progress ?? 0), 0) || 1;
+
 
 
   return (
@@ -268,7 +292,7 @@ export default function ProjectPage(): React.ReactElement {
         <Toolbar />
 
         <View style={styles.content}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/")}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/project/manager")}>
             <Ionicons name="arrow-back" size={18} color="#fff" />
             <Text style={styles.backButtonText}>Home</Text>
           </TouchableOpacity>
@@ -293,10 +317,39 @@ export default function ProjectPage(): React.ReactElement {
             <View style={styles.cardOverview}>
               <Text style={styles.sectionTitle}>Overview</Text>
               <Text style={styles.label}>Deadline: <Text style={styles.value}>{project.deadline ?? '—'}</Text></Text>
-              <Text style={styles.label}>Progress: <Text style={styles.progress}>{
-                tasks.length ? Math.round(tasks.reduce((a, t) => a + (t.progress ?? 0), 0) / tasks.length) : 0
-              }%</Text></Text>
+              <Text style={styles.label}>Progress: <Text style={styles.progress}>{overallProgress}%</Text></Text>
+              {/* Simple chart: overall progress bar + small task segments */}
+              <View style={{ marginTop: 8 }} />
+              <View style={styles.progressChartContainer}>
+                <View style={styles.progressBarBackground}>
+                  <View style={[styles.progressBarFill, { width: `${overallProgress}%` }]} />
+                </View>
+                <View style={{ height: 8 }} />
+                <View style={styles.segmentsRow}>
+                  {tasks.length === 0 ? (
+                    <Text style={styles.emptyText}>No tasks yet</Text>
+                  ) : (
+                    tasks.map((t, idx) => (
+                      <View
+                        key={t.id ?? idx}
+                        style={[
+                          styles.progressSegment,
+                          { backgroundColor: t.color ?? colors[idx % colors.length], width: `${((t.progress ?? 0) / sumProgressSegments) * 100}%` },
+                        ]}
+                      />
+                    ))
+                  )}
+                </View>
+              </View>
               <Text style={styles.description}>{project.description}</Text>
+
+              {/* Budget Card - small */}
+              <View style={[styles.cardContainer, { marginTop: 12 }]}>
+                <Text style={styles.cardTitle}>Budget</Text>
+                <Text style={styles.cardText}>Total allocated: <Text style={styles.value}>{totalBudget ? `${totalBudget} €` : '—'}</Text></Text>
+                <Text style={styles.cardText}>Spent on tasks: <Text style={styles.value}>{spent} €</Text></Text>
+                <Text style={styles.cardText}>Remaining: <Text style={styles.value}>{remaining} €</Text></Text>
+              </View>
 
               <TouchableOpacity
                 onPress={() => {
@@ -327,6 +380,31 @@ export default function ProjectPage(): React.ReactElement {
                   style={styles.progressButton}
                 >
                   <Text style={styles.progressButtonText}>See Progress & Data</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <View style={{ height: 10 }} />
+              <TouchableOpacity
+                onPress={() => {
+                  try {
+                    const payload = encodeURIComponent(
+                      JSON.stringify(tasks.map((t) => ({ ...t })))
+                    );
+                    // navigate to the top-level TaskTable route (web/mobile)
+                    router.push({ pathname: "/TaskTable", params: { tasks: payload } } as any);
+                  } catch (e) {
+                    router.push(("/TaskTable" as unknown) as any);
+                  }
+                }}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={["#10b981", "#06b6d4"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={[styles.progressButton, { marginTop: 6 }]}
+                >
+                  <Text style={styles.progressButtonText}>Open Task Sheet</Text>
                 </LinearGradient>
               </TouchableOpacity>
 
@@ -683,11 +761,37 @@ export default function ProjectPage(): React.ReactElement {
                 ))}
 
                 <Text style={styles.label}>Select Deadline:</Text>
-                <Calendar
-                  onDayPress={(day) => setTaskData({ ...taskData, deadline: day.dateString })}
-                  markedDates={{
-                    [taskData.deadline]: { selected: true, selectedColor: "#1b18b6" },
+                <Text style={styles.label}>Start Date (YYYY-MM-DD)</Text>
+                <TextInput
+                  placeholder="e.g. 2025-11-01"
+                  style={styles.input}
+                  value={taskData.startDate}
+                  onChangeText={(text) => {
+                    setTaskData({ ...taskData, startDate: text });
+                    // show mini calendar if user types something
+                    setShowStartDateCalendar(text.length > 0);
                   }}
+                  onFocus={() => setShowStartDateCalendar(true)}
+                />
+
+                {showStartDateCalendar ? (
+                  <Calendar
+                    onDayPress={(day) => {
+                      setTaskData({ ...taskData, startDate: day.dateString });
+                      setShowStartDateCalendar(false);
+                    }}
+                    markedDates={taskData.startDate ? { [taskData.startDate]: { selected: true, selectedColor: "#1b18b6" } } : {}}
+                    style={styles.calendar}
+                  />
+                ) : null}
+
+                <Text style={[styles.label, { marginTop: 6 }]}>Estimated Cost (optional)</Text>
+                <TextInput
+                  placeholder="e.g. 2500"
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={taskData.cost ? String(taskData.cost) : ""}
+                  onChangeText={(text) => setTaskData({ ...taskData, cost: Number(text.replace(/[^0-9.]/g, "")) })}
                 />
 
                 <View style={styles.modalActions}>
@@ -729,9 +833,21 @@ export default function ProjectPage(): React.ReactElement {
                 />
 
                 <Text style={styles.label}>Select Deadline:</Text>
-                <Calendar
-                  onDayPress={(day) => setTaskData({ ...taskData, deadline: day.dateString })}
-                  markedDates={{ [taskData.deadline]: { selected: true, selectedColor: "#1b18b6" } }}
+                <Text style={styles.label}>Start Date (YYYY-MM-DD)</Text>
+                <TextInput
+                  placeholder="e.g. 2025-11-01"
+                  style={styles.input}
+                  value={taskData.startDate}
+                  onChangeText={(text) => setTaskData({ ...taskData, startDate: text })}
+                />
+                <View style={{ height: 8 }} />
+                <Text style={[styles.label, { marginTop: 6 }]}>Estimated Cost (optional)</Text>
+                <TextInput
+                  placeholder="e.g. 2500"
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={taskData.cost ? String(taskData.cost) : ""}
+                  onChangeText={(text) => setTaskData({ ...taskData, cost: Number(text.replace(/[^0-9.]/g, "")) })}
                 />
 
                 <View style={styles.modalActions}>
@@ -953,6 +1069,13 @@ const styles = StyleSheet.create({
   taskCardContainer: { borderRadius: 10, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 8 },
   taskCardTitle: { fontSize: 14, fontWeight: "700" },
   taskCardDept: { fontSize: 12, opacity: 0.9 },
+
+  /* Progress chart */
+  progressChartContainer: { marginTop: 6 },
+  progressBarBackground: { backgroundColor: '#eef2ff', height: 14, borderRadius: 8, overflow: 'hidden' },
+  progressBarFill: { backgroundColor: '#1b18b6', height: 14 },
+  segmentsRow: { flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden' },
+  progressSegment: { height: 12 },
 
   pastDueAccent: { borderLeftWidth: 4, borderLeftColor: "#ff3333" },
   inProgressAccent: { borderLeftWidth: 4, borderLeftColor: "#1b18b6" },
