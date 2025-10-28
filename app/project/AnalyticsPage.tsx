@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import PageFooter from "../project/components/PageFooter";
-import Toolbar from "../project/components/Toolbar";
+import Toolbar from "./components/Toolbar_manager";
 
 import React, { useEffect, useState } from "react";
 import {

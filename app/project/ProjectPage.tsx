@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import PageFooter from "../project/components/PageFooter";
 import StatusCards from "../project/components/StatusCards";
-import Toolbar from "../project/components/Toolbar";
+import Toolbar from "./components/Toolbar_manager";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -52,7 +52,7 @@ export default function ProjectPage(): React.ReactElement {
   );
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [notes, setNotes] = useState<Array<{ id: string; text: string; date: string; checked?: boolean }>>([]);
+  const [notes, setNotes] = useState<{ id: string; text: string; date: string; checked?: boolean }[]>([]);
   const [noteModal, setNoteModal] = useState(false);
   const [editNoteModal, setEditNoteModal] = useState(false);
   const [noteBeingEdited, setNoteBeingEdited] = useState<{ id: string; text: string } | null>(null);
