@@ -1,15 +1,15 @@
+import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
   Dimensions,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import dayjs from "dayjs";
-import Toolbar from "./project/components/Toolbar_manager";
-import PageFooter from "./project/components/PageFooter";
+
+import Toolbar from "../components-boss/toolbar-boss";
 
 type Task = {
   id: number;
@@ -54,7 +54,7 @@ export default function ProjectPlanner() {
   return (
     <SafeAreaView style={styles.container}>
       <Toolbar />
-      
+
       <Text style={styles.pageTitle}>📊 Project Gantt Planner</Text>
 
       <View style={styles.card}>
@@ -132,8 +132,6 @@ export default function ProjectPlanner() {
           </View>
         </ScrollView>
       </View>
-
-      <PageFooter />
     </SafeAreaView>
   );
 }
@@ -204,10 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     paddingHorizontal: 6,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
   },
   barLabel: { color: "#fff", fontSize: 11, fontWeight: "600" },
 });

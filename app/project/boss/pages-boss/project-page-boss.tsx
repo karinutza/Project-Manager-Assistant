@@ -3,9 +3,8 @@ import dayjs from "dayjs";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 
-import PageFooter from "../project/components/PageFooter";
-import StatusCards from "../project/components/StatusCards";
-import Toolbar from "./components/Toolbar_manager";
+
+import Toolbar from "../components-boss/toolbar-boss";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -292,7 +291,7 @@ export default function ProjectPage(): React.ReactElement {
         <Toolbar />
 
         <View style={styles.content}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/project/manager")}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/project/boss/pages-boss/boss-log-page")}>
             <Ionicons name="arrow-back" size={18} color="#fff" />
             <Text style={styles.backButtonText}>Home</Text>
           </TouchableOpacity>
@@ -364,11 +363,11 @@ export default function ProjectPage(): React.ReactElement {
                       )
                     );
                     router.push({
-                      pathname: "/project/AnalyticsPage",
+                      pathname: "/project/boss/pages-boss/analytics-page-boss",
                       params: { id: project.id, tasks: payload },
                     } as any);
                   } catch (e) {
-                    router.push(("/project/AnalyticsPage" as unknown) as any);
+                    router.push(("/project/boss/pages-boss/analytics-page-boss" as unknown) as any);
                   }
                 }}
                 activeOpacity={0.9}
@@ -385,17 +384,8 @@ export default function ProjectPage(): React.ReactElement {
 
               <View style={{ height: 10 }} />
               <TouchableOpacity
-                onPress={() => {
-                  try {
-                    const payload = encodeURIComponent(
-                      JSON.stringify(tasks.map((t) => ({ ...t })))
-                    );
-                    // navigate to the top-level TaskTable route (web/mobile)
-                    router.push({ pathname: "/TaskTable", params: { tasks: payload } } as any);
-                  } catch (e) {
-                    router.push(("/TaskTable" as unknown) as any);
-                  }
-                }}
+                onPress={() => router.push("/project/boss/pages-boss/microsoft-assistant-page-boss")
+}
                 activeOpacity={0.9}
               >
                 <LinearGradient
@@ -686,31 +676,6 @@ export default function ProjectPage(): React.ReactElement {
           <View style={styles.calendarEmptyRow} />
         </View>
 
-        {/* Task Categories (replaced with a unified StatusCards component) */}
-        <StatusCards
-          pastDue={pastDue}
-          inProgress={inProgress}
-          done={done}
-          departmentColors={departmentColors}
-          textColorForBg={textColorForBg}
-          onMarkDone={(taskId) => {
-            if (!taskId) return;
-            setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, done: true } : t)));
-          }}
-          onEditTask={(taskId) => {
-            if (!taskId) {
-              setWarning("No task selected to edit.");
-              return;
-            }
-            const idx = tasks.findIndex((t) => t.id === taskId);
-            if (idx === -1) {
-              setWarning("Selected task not found.");
-              return;
-            }
-            chooseTaskToEdit(idx);
-          }}
-        />
-
         {/* spacer rows after divider */}
         <View style={styles.calendarEmptyRow} />
         <View style={styles.calendarEmptyRow} />
@@ -922,10 +887,6 @@ export default function ProjectPage(): React.ReactElement {
             </View>
           </View>
         </Modal>
-
-        {/* Footer */}
-        <PageFooter />
-
       </ScrollView>
     </SafeAreaView >
   );
