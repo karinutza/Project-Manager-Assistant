@@ -5,36 +5,61 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Toolbar() {
   return (
-    <View style={styles.toolbar}>
-      <Ionicons name="menu-outline" size={28} color="#fff" />
-      <Text style={styles.appName}>Project Manager Assistant</Text>
-      <TouchableOpacity onPress={() => router.push({ pathname: "/project/manager/pages-manager/user-profile-manager" } as any)}>
-        <Image source={require("../../../../assets/user.png")} style={styles.profileImage} />
-      </TouchableOpacity>
+    <View style={styles.toolbarContainer}>
+      <View style={styles.toolbar}>
+        <TouchableOpacity>
+          <Ionicons name="menu-outline" size={28} color="#fff" />
+        </TouchableOpacity>
+
+        <Text style={styles.appName}>Project Manager</Text>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() =>
+            router.push({
+              pathname: "/project/manager/pages-manager/user-profile-manager",
+            } as any)
+          }
+        >
+          <Image
+            source={require("../../../../assets/user.png")}
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  toolbarContainer: {
+    backgroundColor: "#1a1f71",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
   toolbar: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 18,
-    paddingVertical: 14,
-    backgroundColor: "#1b18b6",
-    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
+    paddingVertical: 12,
   },
   appName: {
     color: "#fff",
-    fontWeight: "600",
-    fontSize: 25,
+    fontWeight: "700",
+    fontSize: 20,
+    letterSpacing: 0.5,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderColor: "#fff",
-    borderWidth: 1.5,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.8)",
   },
 });

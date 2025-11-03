@@ -7,7 +7,7 @@ export default function Index() {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (username === "manager" && password === "manager") {
+    if (username === "" && password === "") {
       router.replace("../../project/manager/pages-manager/manager-log-page"); // navighează la Manager
     } else if (username === "boss" && password === "boss") {
       router.replace("../../project/boss/pages-boss/boss-log-page"); // navighează la Șef Departament
