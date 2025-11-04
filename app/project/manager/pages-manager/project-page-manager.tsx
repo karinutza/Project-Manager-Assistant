@@ -1,8 +1,17 @@
+// project-page-manager.tsx
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Toolbar from "../components-manager/toolbar-manager";
@@ -10,12 +19,13 @@ import OverviewNotesComponent from "../components-manager/overview-notes-compone
 import StatusCards from "../components-manager/status-cards";
 import CalendarComponent from "../components-manager/calendar-component";
 
-export default function ProjectPage(): React.ReactElement {
+export default function ProjectPageManager(): React.ReactElement {
   const params = useLocalSearchParams();
   const rawId = params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
   type Task = {
+    id?: string;
     name: string;
     departments: string[];
     color: string;
@@ -23,7 +33,6 @@ export default function ProjectPage(): React.ReactElement {
     createdAt: string;
     done?: boolean;
     progress?: number;
-    id?: string;
     startDate?: string;
     cost?: number;
   };
@@ -39,11 +48,13 @@ export default function ProjectPage(): React.ReactElement {
   const [project, setProject] = useState<Project>({
     id,
     name: `Project ${id}`,
-    description: " ",
+    description: "Engineering and manufacturing timeline.",
   });
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [notes, setNotes] = useState<{ id: string; text: string; date: string; checked?: boolean }[]>([]);
+  const [notes, setNotes] = useState<
+    { id: string; text: string; date: string; checked?: boolean }[]
+  >([]);
 
   const today = dayjs();
 
@@ -90,30 +101,39 @@ export default function ProjectPage(): React.ReactElement {
   return (
     <SafeAreaView style={styles.container}>
       <Toolbar />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* HEADER */}
-        <View style={styles.header}>
-          {/* HOME BUTTON: plasat sus-stânga, cu card shadow și padding */}
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={() => router.push("/project/manager/pages-manager/manager-log-page")}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="home-outline" size={22} color="#fff" />
-            <Text style={styles.homeButtonText}>Home</Text>
-          </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* HEADER CU GRADIENT */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 1]}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerRow}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                router.push("/project/manager/pages-manager/manager-log-page")
+              }
+              activeOpacity={0.8}
+            >
+              <Ionicons name="home-outline" size={20} color="#fff" />
+            </TouchableOpacity>
 
-          {/* DESCRIERE PROIECT */}
-          <View style={styles.projectHeaderCard}>
-            <Text style={styles.projectName}>{project.name}</Text>
-            <Text style={styles.projectDescription}>
-              {project.description?.trim() || "No description provided for this project."}
-            </Text>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>{project.name}</Text>
+              <Text style={styles.headerSubtitle}>
+                {project.description?.trim() ||
+                  "No description provided for this project."}
+              </Text>
+            </View>
+
+            <View style={{ width: 40 }} />
           </View>
-        </View>
+        </LinearGradient>
 
-        {/* OVERVIEW + NOTES */}
-        <View style={styles.overviewContainer}>
+        {/* OVERVIEW & NOTES */}
+        <View>
           <OverviewNotesComponent
             project={project}
             tasks={tasks}
@@ -125,8 +145,12 @@ export default function ProjectPage(): React.ReactElement {
               )
             }
             onToggleNoteChecked={toggleNoteChecked}
-            onAnalyticsPress={() => router.push("/project/manager/pages-manager/analytics-page")}
-            onOpenTaskSheet={() => router.push("/project/manager/pages-manager/microsoft-assistant-page")}
+            onAnalyticsPress={() =>
+              router.push("/project/manager/pages-manager/analytics-page")
+            }
+            onOpenTaskSheet={() =>
+              router.push("/project/manager/pages-manager/microsoft-assistant-page")
+            }
           />
         </View>
 
@@ -158,9 +182,9 @@ export default function ProjectPage(): React.ReactElement {
           />
         </View>
 
-        {/* STATUS CARDS */}
+        {/* STATUS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Status</Text>
+          <Text style={styles.sectionTitle}></Text>
           <StatusCards
             pastDue={pastDue}
             inProgress={inProgress}
@@ -182,142 +206,70 @@ export default function ProjectPage(): React.ReactElement {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-};
+  );
+}
 
+// 🔷 STYLES
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f4f5f7" },
-  scrollContent: { paddingBottom: 100, paddingHorizontal: 16 },
-  
-  projectHeaderCard: {
-  backgroundColor: "#ffffff",
-  borderRadius: 20,
-  paddingVertical: 16,
-  paddingHorizontal: 20, // puțin mai lat pentru text
-  alignItems: "center",
-  alignSelf: "center", // cardul se poziționează centrat, dar nu mai ocupă 92% din lățime
-  shadowColor: "#000",
-  shadowOpacity: 0.08,
-  shadowRadius: 8,
-  elevation: 4,
-  marginTop: 60,
-  maxWidth: 500, // limitează lățimea cardului
-  minWidth: 200, // să nu fie prea strâmt pe ecrane mari
-},
-  // HEADER
-  header: { marginBottom: 28, alignItems: "center" },
+  container: { flex: 1, backgroundColor: "#F6F7FB" },
+  scrollContainer: { paddingBottom: 120, paddingHorizontal: 14 },
 
-  backButton: {
+  /* HEADER */
+  headerGradient: {
+    paddingTop: Platform.OS === "ios" ? 44 : 20,
+    paddingBottom: 24,
+    paddingHorizontal: 18,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginBottom: 14,
+    elevation: 6,
+  },
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#6366f1",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 14,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    justifyContent: "space-between",
   },
-  backButtonText: { color: "#fff", fontWeight: "600", marginLeft: 8, fontSize: 16 },
-  projectName: {
-    fontSize: 30,
+  iconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitleWrap: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 20,
     fontWeight: "800",
-    color: "#160ca8ff",
     textAlign: "center",
-    marginBottom: 8,
-    letterSpacing: 0.3,
   },
-  projectDescription: {
-    fontSize: 16,
-    color: "#6b7280",
+  headerSubtitle: {
+    color: "rgba(255,255,255,0.9)",
+    fontSize: 13,
+    marginTop: 4,
     textAlign: "center",
-    lineHeight: 22,
   },
 
-  // SECTIONS / CARDS
+  /* SECTIONS */
   section: {
     backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 18,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 16,
+    elevation: 2,
     shadowColor: "#000",
     shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowRadius: 8,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 12,
-    color: "#1e293b",
-  },
-
-  // BUTTONS
-  primaryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#6366f1",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "600", marginLeft: 6 },
-  secondaryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#10b981",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  secondaryButtonText: { color: "#fff", fontWeight: "600", marginLeft: 6 },
-  homeButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#4f46e5",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-    position: "absolute",
-    left: 0,
-    top: 0,
-    marginLeft: 16,
-    marginTop: 10,
-  },
-  homeButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-    marginLeft: 8,
     fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 10,
   },
-  sectionWithoutMargin: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 0, // eliminăm spațiul dintre notes și calendar
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-
-  overviewContainer: {
-    width: "100%", // lățime full pentru a se alinia cu celelalte secțiuni
-    marginBottom: 0, // eliminăm spațiul gol dintre Notes și Calendar
-  },
-
 });

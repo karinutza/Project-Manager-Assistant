@@ -505,35 +505,22 @@ export default function CalendarComponent({
                     <TouchableOpacity onPress={() => setShowModal(false)}>
                       <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={addTask}>
+
+                    {/* ADD TASK */}
+                    <TouchableOpacity onPress={addTask} activeOpacity={0.9}>
                       <LinearGradient
                         colors={["#1b18b6", "#2063f4", "#2420f9"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={{
-                          paddingVertical: 10,
-                          paddingHorizontal: 25,
+                          flexDirection: "row", 
+                          alignItems: "center", 
+                          justifyContent: "center",
+                          padding: 12,
                           borderRadius: 12,
+                          marginTop: 12,
                         }}
                       >
-                        <TouchableOpacity
-                          onPress={handleAddTask}
-                          activeOpacity={0.85}
-                          style={{
-                            backgroundColor: "#4F46E5",
-                            borderRadius: 14,
-                            paddingVertical: 12,
-                            paddingHorizontal: 24,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 3 },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            elevation: 5,
-                          }}
-                        >
                           <Ionicons name="add-circle-outline" size={22} color="white" style={{ marginRight: 8 }} />
                           <Text
                             style={{
@@ -541,11 +528,11 @@ export default function CalendarComponent({
                               fontWeight: "600",
                               fontSize: 16,
                               letterSpacing: 0.5,
+                              textAlign: "center",
                             }}
                           >
                             Add Task
                           </Text>
-                        </TouchableOpacity>
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>

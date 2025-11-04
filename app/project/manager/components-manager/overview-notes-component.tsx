@@ -1,15 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { router } from "expo-router";
 import {
   Animated,
   Modal,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 type Note = {
@@ -74,192 +74,101 @@ export default function OverviewNotesComponent({
   const spent = tasks.reduce((a, t) => a + (t.cost ?? 0), 0);
   const remaining = Math.max(0, totalBudget - spent);
 
-  type CardProps = {
-    children: React.ReactNode;
-    isLast?: boolean;
-  };
-
-  const Card: React.FC<CardProps> = ({ children, isLast }) => (
-    <View
-      style={{
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        borderRadius: 24,
-        padding: 20,
-        marginBottom: isLast ? 0 : 22, // ultimul card fără spațiu
-        width: "100%", // lățimea uniformă
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 6,
-        backdropFilter: "blur(8px)",
-      }}
-    >
-      {children}
-    </View>
-  );
-
-
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 20,
-        paddingBottom: 0,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* PROJECT STATS */}
-      <Card style={{ marginBottom: 22 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 14, alignItems: "center" }}>
-          <Text style={{ fontWeight: "700", fontSize: 18, color: "#1e293b" }}>📊 Overview</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>📊 Overview</Text>
           <TouchableOpacity
-            onPress={() => router.push("/project/manager/pages-manager/detailed-overview-page")}>
+            onPress={() =>
+              router.push("/project/manager/pages-manager/detailed-overview-page")
+            }
+          >
             <Ionicons name="information-circle-outline" size={22} color="#3b82f6" />
           </TouchableOpacity>
         </View>
 
-
-        <View style={{ flexDirection: "row", justifyContent: "space-around", marginVertical: 10 }}>
-          <View style={{ alignItems: "center" }}>
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
             <Ionicons name="calendar-outline" size={22} color="#6366f1" />
-            <Text style={{ fontSize: 14, color: "#334155" }}>{project.deadline ?? "No deadline"}</Text>
+            <Text style={styles.statText}>{project.deadline ?? "No deadline"}</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
+          <View style={styles.statItem}>
             <Ionicons name="cash-outline" size={22} color="#16a34a" />
-            <Text style={{ fontSize: 14, color: "#334155" }}>{remaining} € left</Text>
+            <Text style={styles.statText}>{remaining} € left</Text>
           </View>
-          <View style={{ alignItems: "center" }}>
+          <View style={styles.statItem}>
             <Ionicons name="bar-chart-outline" size={22} color="#0ea5e9" />
-            <Text style={{ fontSize: 14, color: "#334155" }}>{overallProgress}%</Text>
+            <Text style={styles.statText}>{overallProgress}%</Text>
           </View>
         </View>
 
-        <View style={{ marginTop: 14 }}>
-          <View
-            style={{
-              height: 10,
-              borderRadius: 8,
-              backgroundColor: "#E5E7EB",
-              overflow: "hidden",
-            }}
-          >
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBarBackground}>
             <Animated.View
-              style={{
-                height: "100%",
-                width: `${overallProgress}%`,
-                backgroundColor: "#6366f1",
-                borderRadius: 8,
-              }}
+              style={[styles.progressBarFill, { width: `${overallProgress}%` }]}
             />
           </View>
         </View>
-      </Card>
+      </View>
 
       {/* ACTIONS */}
-      <Card>
+      <View style={styles.card}>
         <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: "#3b82f6" }]}
           onPress={onAnalyticsPress}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#3b82f6",
-            paddingVertical: 14,
-            borderRadius: 16,
-            justifyContent: "center",
-            marginBottom: 12,
-          }}
         >
           <Ionicons name="stats-chart" size={20} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16, marginLeft: 6 }}>
-            View Analytics
-          </Text>
+          <Text style={styles.actionText}>View Analytics</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: "#10b981" }]}
           onPress={onOpenTaskSheet}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#10b981",
-            paddingVertical: 14,
-            borderRadius: 16,
-            justifyContent: "center",
-          }}
         >
           <Ionicons name="briefcase-outline" size={20} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16, marginLeft: 6 }}>
-            Manage Tasks
-          </Text>
+          <Text style={styles.actionText}>Manage Tasks</Text>
         </TouchableOpacity>
-      </Card>
+      </View>
 
       {/* TASKS */}
-      <Card>
-        <Text style={{ fontSize: 18, fontWeight: "700", color: "#1e293b" }}>📝 Tasks</Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>📝 Tasks</Text>
         {tasks.length === 0 ? (
-          <Text style={{ color: "#94a3b8", fontStyle: "italic" }}>No tasks yet.</Text>
+          <Text style={styles.emptyText}>No tasks yet.</Text>
         ) : (
           tasks.map((t) => (
-            <View
-              key={t.id ?? t.name}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderColor: "#f1f5f9",
-              }}
-            >
+            <View key={t.id ?? t.name} style={styles.taskItem}>
               <Ionicons
                 name={t.done ? "checkmark-circle" : "ellipse-outline"}
                 size={22}
                 color={t.done ? "#10b981" : "#cbd5e1"}
               />
-              <Text
-                style={{
-                  marginLeft: 10,
-                  fontSize: 15,
-                  color: t.done ? "#94a3b8" : "#1e293b",
-                  textDecorationLine: t.done ? "line-through" : "none",
-                }}
-              >
+              <Text style={[styles.taskText, t.done && styles.taskDone]}>
                 {t.name}
               </Text>
             </View>
           ))
         )}
-      </Card>
+      </View>
 
       {/* NOTES */}
-      <Card style={{ marginBottom: 0 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <Text style={{ fontSize: 18, fontWeight: "700", color: "#1e293b" }}>🗒️ Notes</Text>
+      <View style={[styles.card, { marginBottom: 0 }]}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>🗒️ Notes</Text>
           <TouchableOpacity onPress={() => setNoteModal(true)}>
             <Ionicons name="add-circle" size={28} color="#6366f1" />
           </TouchableOpacity>
         </View>
 
         {notes.slice(0, 5).map((n) => (
-          <View
-            key={n.id}
-            style={{
-              marginTop: 10,
-              paddingVertical: 8,
-              borderBottomWidth: 1,
-              borderColor: "#f1f5f9",
-            }}
-          >
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text
-                style={{
-                  fontSize: 15,
-                  color: n.checked ? "#94a3b8" : "#1e293b",
-                  textDecorationLine: n.checked ? "line-through" : "none",
-                }}
-              >
+          <View key={n.id} style={styles.noteItem}>
+            <View style={styles.noteRow}>
+              <Text style={[styles.noteText, n.checked && styles.noteChecked]}>
                 {n.text}
               </Text>
-              <View style={{ flexDirection: "row", gap: 12 }}>
+              <View style={styles.noteActions}>
                 <TouchableOpacity
                   onPress={() => {
                     setNoteBeingEdited(n);
@@ -277,70 +186,40 @@ export default function OverviewNotesComponent({
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>{n.date}</Text>
+            <Text style={styles.noteDate}>{n.date}</Text>
           </View>
         ))}
-      </Card>
+      </View>
 
       {/* NOTE MODAL */}
-      <Modal visible={noteModal} transparent animationType="slide" onRequestClose={() => setNoteModal(false)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: "90%",
-              backgroundColor: "#fff",
-              borderRadius: 16,
-              padding: 20,
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#1e293b", marginBottom: 16 }}>
-              Add Note
-            </Text>
+      <Modal
+        visible={noteModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setNoteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add Note</Text>
             <TextInput
               placeholder="Write a note..."
-              style={{
-                borderWidth: 1,
-                borderColor: "#e2e8f0",
-                borderRadius: 12,
-                padding: 12,
-                minHeight: 100,
-                textAlignVertical: "top",
-                fontSize: 16,
-                color: "#1e293b",
-              }}
+              style={styles.modalInput}
               multiline
               value={newNote}
               onChangeText={setNewNote}
             />
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 20,
-              }}
-            >
+            <View style={styles.modalActions}>
               <TouchableOpacity
                 onPress={() => {
                   setNewNote("");
                   setNoteModal(false);
                 }}
               >
-                <Text style={{ color: "#64748b", fontWeight: "600", fontSize: 16 }}>Cancel</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  if (!newNote || newNote.trim() === "") return setNoteModal(false);
+                  if (!newNote.trim()) return setNoteModal(false);
                   const note = {
                     id: `${Date.now()}`,
                     text: newNote.trim(),
@@ -351,7 +230,7 @@ export default function OverviewNotesComponent({
                   setNoteModal(false);
                 }}
               >
-                <Text style={{ color: "#6366f1", fontWeight: "700", fontSize: 16 }}>Save Note</Text>
+                <Text style={styles.saveText}>Save Note</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -359,54 +238,26 @@ export default function OverviewNotesComponent({
       </Modal>
 
       {/* EDIT NOTE MODAL */}
-      <Modal visible={editNoteModal} transparent animationType="slide" onRequestClose={() => setEditNoteModal(false)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: "90%",
-              backgroundColor: "#fff",
-              borderRadius: 16,
-              padding: 20,
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <Text style={{ fontSize: 20, fontWeight: "700", color: "#1e293b", marginBottom: 16 }}>
-              Edit Note
-            </Text>
+      <Modal
+        visible={editNoteModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setEditNoteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Note</Text>
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: "#e2e8f0",
-                borderRadius: 12,
-                padding: 12,
-                minHeight: 100,
-                textAlignVertical: "top",
-                fontSize: 16,
-                color: "#1e293b",
-              }}
+              style={styles.modalInput}
               multiline
               value={noteBeingEdited?.text || ""}
-              onChangeText={(text) => setNoteBeingEdited((prev) => (prev ? { ...prev, text } : null))}
+              onChangeText={(text) =>
+                setNoteBeingEdited((prev) => (prev ? { ...prev, text } : null))
+              }
             />
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 20,
-              }}
-            >
+            <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setEditNoteModal(false)}>
-                <Text style={{ color: "#64748b", fontWeight: "600", fontSize: 16 }}>Cancel</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -416,7 +267,7 @@ export default function OverviewNotesComponent({
                   }
                 }}
               >
-                <Text style={{ color: "#6366f1", fontWeight: "700", fontSize: 16 }}>Save Changes</Text>
+                <Text style={styles.saveText}>Save Changes</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -425,3 +276,93 @@ export default function OverviewNotesComponent({
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { padding: 20, paddingBottom: 0 },
+  card: {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 22,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 14,
+    alignItems: "center",
+  },
+  cardTitle: { fontWeight: "700", fontSize: 18, color: "#1e293b" },
+  statsRow: { flexDirection: "row", justifyContent: "space-around", marginVertical: 10 },
+  statItem: { alignItems: "center" },
+  statText: { fontSize: 14, color: "#334155", marginTop: 4 },
+  progressContainer: { marginTop: 10 },
+  progressBarBackground: {
+    height: 8,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: 8,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  actionText: { color: "#fff", fontWeight: "600", marginLeft: 8 },
+  emptyText: { color: "#94a3b8", textAlign: "center", marginTop: 10 },
+  taskItem: { flexDirection: "row", alignItems: "center", marginVertical: 6 },
+  taskText: { marginLeft: 10, color: "#1e293b" },
+  taskDone: { textDecorationLine: "line-through", color: "#9ca3af" },
+  noteItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    paddingVertical: 8,
+  },
+  noteRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  noteText: { color: "#1e293b", flex: 1, marginRight: 10 },
+  noteChecked: { textDecorationLine: "line-through", color: "#9ca3af" },
+  noteDate: { fontSize: 12, color: "#94a3b8", marginTop: 2 },
+  noteActions: { flexDirection: "row", alignItems: "center", gap: 10 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    width: "100%",
+    padding: 20,
+  },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: "#1e293b", marginBottom: 10 },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 10,
+    padding: 10,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+    gap: 20,
+  },
+  cancelText: { color: "#ef4444", fontWeight: "600" },
+  saveText: { color: "#3b82f6", fontWeight: "600" },
+});
