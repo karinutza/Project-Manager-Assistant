@@ -1,16 +1,39 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import BurgerMenu from "./BurgerMenu"; // importăm componenta globală
 
 export default function Toolbar() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <View style={styles.toolbar}>
-      <Ionicons name="menu-outline" size={28} color="#fff" />
-      <Text style={styles.appName}>Department Member Assistant</Text>
-      <TouchableOpacity onPress={() => router.push({ pathname: "/project/worker/pages-worker/user-profile-worker" } as any)}>
-        <Image source={require("../../../../assets/user.png")} style={styles.profileImage} />
-      </TouchableOpacity>
+    <View style={{ zIndex: 100 }}>
+      {/* Toolbar */}
+      <View style={styles.toolbar}>
+        {/* Burger */}
+        <TouchableOpacity onPress={() => setOpen(!open)}>
+          <Ionicons name="menu-outline" size={32} color="#fff" />
+        </TouchableOpacity>
+
+        {/* Title */}
+        <Text style={styles.appName}>Department Member Assistant</Text>
+
+        {/* Profile Button */}
+        <TouchableOpacity
+          onPress={() =>
+            router.push("/project/worker/pages-worker/user-profile-worker")
+          }
+        >
+          <Image
+            source={require("../../../../assets/user.png")}
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Lateral Menu */}
+      {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
     </View>
   );
 }
@@ -23,17 +46,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 14,
     backgroundColor: "#1b18b6",
-    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.22,
+    shadowOffset: { width: 0, height: 2 },
   },
+
   appName: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 25,
+    fontSize: 20,
   },
+
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     borderColor: "#fff",
     borderWidth: 1.5,
   },

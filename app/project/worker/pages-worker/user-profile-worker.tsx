@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -15,7 +14,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const STORAGE_KEY = "@pma_user_v1";
@@ -70,8 +69,7 @@ export default function ProjectUserPage() {
       {/* Content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
         <View style={styles.profileCard}>
-          <Image source={require("../../../../assets/user.png")} style={styles.avatar} />
-
+        
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.userRank}>{user?.rank}</Text>
 
