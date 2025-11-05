@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import BurgerMenu from "./BurgerMenu"; // importăm componenta globală
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import BurgerMenu from "./burger-menu-worker"; // importăm componenta globală
 
 export default function Toolbar() {
   const [open, setOpen] = useState(false);
@@ -19,6 +19,15 @@ export default function Toolbar() {
         {/* Title */}
         <Text style={styles.appName}>Department Member Assistant</Text>
 
+        {/* Profile Button */}
+        <TouchableOpacity
+          onPress={() =>
+            router.push("/project/worker/pages-worker/user-profile-worker")
+          }
+        >
+          
+          
+        </TouchableOpacity>
       </View>
 
       {/* Lateral Menu */}

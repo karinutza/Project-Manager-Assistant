@@ -1,10 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 
+import BurgerMenu from "./burger-menu-manager";
+
 export default function Toolbar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <LinearGradient
       colors={["#2962FF", "#4FC3F7"]}
@@ -20,6 +24,8 @@ export default function Toolbar() {
       >
         <Ionicons name="menu-outline" size={28} color="#fff" />
       </TouchableOpacity>
+
+      {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
     </LinearGradient>
   );
 }

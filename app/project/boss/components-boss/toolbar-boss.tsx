@@ -1,39 +1,61 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+
+import BurgerMenu from "./burger-menu-boss";
 
 export default function Toolbar() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <View style={styles.toolbar}>
-      <Ionicons name="menu-outline" size={28} color="#fff" />
-      <Text style={styles.appName}>Department Boss Assistant</Text>
-      <TouchableOpacity onPress={() => router.push({ pathname: "/project/pages/user-profile-page" } as any)}>
-         </TouchableOpacity>
-    </View>
+    <LinearGradient
+      colors={["#2962FF", "#4FC3F7"]}
+      start={[0, 0]}
+      end={[1, 1]}
+      style={styles.toolbarContainer}
+    >
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          /* poți adăuga deschiderea unui meniu lateral aici */
+        }}
+      >
+        <Ionicons name="menu-outline" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  toolbar: {
+  toolbarContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 18,
-    paddingVertical: 14,
-    backgroundColor: "#1b18b6",
-    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   appName: {
     color: "#fff",
-    fontWeight: "600",
-    fontSize: 25,
+    fontWeight: "700",
+    fontSize: 20,
+    letterSpacing: 0.5,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderColor: "#fff",
-    borderWidth: 1.5,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.8)",
   },
 });

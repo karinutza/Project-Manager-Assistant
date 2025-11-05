@@ -14,15 +14,15 @@ export default function BurgerMenu({ closeMenu }: BurgerMenuProps) {
 
   return (
     <View style={styles.menu}>
-      <TouchableOpacity onPress={() => handleNavigation("/project/worker/pages-worker/user-profile-worker")}>
+      <TouchableOpacity onPress={() => handleNavigation("/project/boss/pages-boss/user-profile-page-boss")}>
         <Text style={styles.menuItem}>Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleNavigation("/project/worker/pages-worker/community-page-worker")}>
+      <TouchableOpacity onPress={() => handleNavigation("/project/boss/pages-boss/community-page-boss")}>
         <Text style={styles.menuItem}>Community</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleNavigation("/project/worker/pages-worker/settings-page-worker")}>
+      <TouchableOpacity onPress={() => handleNavigation("/project/boss/pages-boss/settings-page-boss")}>
         <Text style={styles.menuItem}>Settings</Text>
       </TouchableOpacity>
 
