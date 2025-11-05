@@ -20,20 +20,6 @@ export default function Toolbar() {
       >
         <Ionicons name="menu-outline" size={28} color="#fff" />
       </TouchableOpacity>
-
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() =>
-          router.push({
-            pathname: "/project/manager/pages-manager/user-profile-manager",
-          } as any)
-        }
-      >
-        <Image
-          source={require("../../../../assets/user.png")}
-          style={styles.profileImage}
-        />
-      </TouchableOpacity>
     </LinearGradient>
   );
 }

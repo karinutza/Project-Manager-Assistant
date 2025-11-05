@@ -19,17 +19,6 @@ export default function Toolbar() {
         {/* Title */}
         <Text style={styles.appName}>Department Member Assistant</Text>
 
-        {/* Profile Button */}
-        <TouchableOpacity
-          onPress={() =>
-            router.push("/project/worker/pages-worker/user-profile-worker")
-          }
-        >
-          <Image
-            source={require("../../../../assets/user.png")}
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
       </View>
 
       {/* Lateral Menu */}

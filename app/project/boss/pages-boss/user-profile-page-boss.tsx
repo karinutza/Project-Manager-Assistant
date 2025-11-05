@@ -70,8 +70,6 @@ export default function ProjectUserPage() {
       {/* Content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
         <View style={styles.profileCard}>
-          <Image source={require("../../../../assets/user.png")} style={styles.avatar} />
-
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.userRank}>{user?.rank}</Text>
 
