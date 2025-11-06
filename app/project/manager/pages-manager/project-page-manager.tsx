@@ -61,15 +61,15 @@ export default function ProjectPageManager(): React.ReactElement {
   const departmentColors: Record<string, string> = {
     "Design Mecanic": "#ff16d4ff",
     "Design Electric": "#33C1FF",
-    Purchasing: "#004f2fff",
+    "Purchasing": "#004f2fff",
     "Tooling Shop": "#17e100ff",
     "Assamblare Mecanica": "#ff3333ff",
     "Assamblare Electrica": "#FF8F33",
     "Assamblare Finala": "#8F33FF",
     "Software Offline": "#008c85ff",
     "Software Debug": "#00a643ff",
-    Teste: "#3a33ffff",
-    Livrare: "#d454ffff",
+    "Teste": "#3a33ffff",
+    "Livrare": "#d454ffff",
   };
 
   function textColorForBg(hex: string) {
