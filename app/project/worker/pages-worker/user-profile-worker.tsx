@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
+  Image,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -63,13 +64,18 @@ export default function ProjectUserPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Toolbar (matched from HomeScreen but keeps home icon) */}
+      {/* Toolbar */}
       <Toolbar />
 
       {/* Content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
         <View style={styles.profileCard}>
-        
+          {/* Poza de profil sus */}
+          <Image
+            source={require("../../../user.png")} // ajustează calea corect
+            style={styles.profileImage}
+          />
+
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.userRank}>{user?.rank}</Text>
 
@@ -131,6 +137,7 @@ export default function ProjectUserPage() {
                 <TouchableOpacity onPress={() => setEditing(false)}>
                   <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
+                
                 <TouchableOpacity style={styles.saveButton} onPress={save}>
                   <Text style={styles.saveText}>Save</Text>
                 </TouchableOpacity>
@@ -153,7 +160,12 @@ const styles = StyleSheet.create({
     boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
     alignItems: "center",
   },
-  avatar: { width: 110, height: 110, borderRadius: 55, marginBottom: 10 },
+  profileImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    marginBottom: 16,
+  },
   userName: { fontSize: 20, fontWeight: "700", color: "#0f1724" },
   userRank: { fontSize: 14, color: "#6b7280", marginBottom: 12 },
   statsRow: { flexDirection: "row", justifyContent: "space-around", width: "100%", marginBottom: 18 },

@@ -1,20 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import dayjs from "dayjs";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  LayoutChangeEvent,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { KeyboardAvoidingView, Platform } from "react-native";
-import Slider from "@react-native-community/slider";
 
 type Task = {
   id?: string;
@@ -32,7 +31,7 @@ type Props = {
   departmentColors: Record<string, string>;
   textColorForBg: (hex: string) => string;
   styles: any;
-  onTaskAdded?: (task: Task) => void;
+  onTaskAdded?: (task: Task) => void; // ✅ PROPS DEFINIT CORECT
 };
 
 export default function CalendarComponent({
@@ -40,7 +39,7 @@ export default function CalendarComponent({
   departmentColors,
   textColorForBg,
   styles,
-  onTaskAdded,
+  onTaskAdded, // ✅ SCOS DIN PROPS
 }: Props) {
   const today = dayjs();
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -48,17 +47,6 @@ export default function CalendarComponent({
   const [showCalendar, setShowCalendar] = useState<"start" | "deadline" | null>(null);
   const [calendarPosition, setCalendarPosition] = useState<number>(0);
   const [warning, setWarning] = useState("");
-
-  const handleAddTask = () => {
-    const newTask = {
-      name: "New Task",
-      departments: ["General"],
-      color: "#4F46E5",
-      deadline: new Date().toISOString().slice(0, 10),
-    };
-
-    onTaskAdded(newTask);
-  };
 
   const [taskData, setTaskData] = useState({
     name: "",
@@ -72,12 +60,6 @@ export default function CalendarComponent({
 
   const startInputRef = useRef<View>(null);
   const deadlineInputRef = useRef<View>(null);
-
-  const measureCalendarPosition = (ref: React.RefObject<View>) => {
-    ref.current?.measure((_x, _y, _width, height, _pageX, pageY) => {
-      setCalendarPosition(pageY + height + 10);
-    });
-  };
 
   const departmentsList = [
     "Design Mecanic",
@@ -114,7 +96,13 @@ export default function CalendarComponent({
       progress: taskData.progress,
     };
 
+    // ✅ adaugă task în lista locală
     setTasks((prev) => [...prev, newTask]);
+
+    // ✅ trimite task-ul în parent dacă există un callback
+    onTaskAdded?.(newTask);
+
+    // reset modal
     setTaskData({
       name: "",
       description: "",
@@ -127,7 +115,7 @@ export default function CalendarComponent({
     setShowModal(false);
     setShowCalendar(null);
     setWarning("");
-    onTaskAdded?.(newTask);
+
     Alert.alert("Task added!", `${newTask.name} - ${firstDept}`);
   };
 
@@ -155,8 +143,8 @@ export default function CalendarComponent({
             dayTasks.length > 0
               ? (dayTasks[0].color ?? "#1b18b6") + "22"
               : isToday
-                ? "#EEF2FF"
-                : "#fff";
+              ? "#EEF2FF"
+              : "#fff";
 
           return (
             <View
@@ -213,7 +201,7 @@ export default function CalendarComponent({
         }}
         firstDay={1}
         hideExtraDays={false}
-        enableSwipeMonths={true}
+        enableSwipeMonths
       />
 
       {/* Buton Add Task */}
@@ -231,7 +219,7 @@ export default function CalendarComponent({
         </TouchableOpacity>
       </View>
 
-      {/* Modal profesional pentru adăugare task */}
+      {/* Modal */}
       <Modal visible={showModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
@@ -327,14 +315,13 @@ export default function CalendarComponent({
                             backgroundColor: selected ? "#1b18b6" : "#fff",
                           }}
                           onPress={() => {
-                            const exists = taskData.departments.includes(dep);
                             const updated = selected
                               ? taskData.departments.filter((d) => d !== dep)
                               : [...taskData.departments, dep];
                             setTaskData({
                               ...taskData,
                               departments: updated,
-                              color: departmentColors[dep] ?? taskData.color
+                              color: departmentColors[dep] ?? taskData.color,
                             });
                           }}
                         >
@@ -346,8 +333,7 @@ export default function CalendarComponent({
 
                           <Text
                             style={{
-                              color: selected ?
-                                textColor : "#1b18b6",
+                              color: selected ? textColor : "#1b18b6",
                               textAlign: "center",
                               fontWeight: "600",
                             }}
@@ -359,7 +345,6 @@ export default function CalendarComponent({
                     })}
                   </View>
 
-                  {/* Start Date */}
                   <Text style={styles.label}>Start Date</Text>
                   <TextInput
                     placeholder="YYYY-MM-DD"
@@ -368,54 +353,37 @@ export default function CalendarComponent({
                     onFocus={() => setShowCalendar("start")}
                   />
 
-                  {/* Calendar pentru Start Date */}
                   {showCalendar === "start" && (
                     <View style={{ height: 400, marginVertical: 10 }}>
-                      <View style={{ marginVertical: 10, borderRadius: 12, overflow: "hidden", borderWidth: 1, borderColor: "#E0E0E0" }}>
+                      <View
+                        style={{
+                          marginVertical: 10,
+                          borderRadius: 12,
+                          overflow: "hidden",
+                          borderWidth: 1,
+                          borderColor: "#E0E0E0",
+                        }}
+                      >
                         <Calendar
                           onDayPress={(day) => {
-                            if (showCalendar === "start") {
-                              setTaskData({ ...taskData, startDate: day.dateString });
-                            } else if (showCalendar === "deadline") {
-                              setTaskData({ ...taskData, deadline: day.dateString });
-                            }
+                            setTaskData({ ...taskData, startDate: day.dateString });
                             setShowCalendar(null);
                           }}
                           markedDates={{
-                            ...(taskData.startDate && showCalendar === "start"
-                              ? { [taskData.startDate]: { selected: true, selectedColor: "#1b18b6", selectedTextColor: "#fff" } }
+                            ...(taskData.startDate
+                              ? {
+                                  [taskData.startDate]: {
+                                    selected: true,
+                                    selectedColor: "#1b18b6",
+                                    selectedTextColor: "#fff",
+                                  },
+                                }
                               : {}),
-                            ...(taskData.deadline && showCalendar === "deadline"
-                              ? { [taskData.deadline]: { selected: true, selectedColor: "#f54b64", selectedTextColor: "#fff" } }
-                              : {}),
-                          }}
-                          theme={{
-                            backgroundColor: "#FAFAFA",
-                            calendarBackground: "#FAFAFA",
-                            textSectionTitleColor: "#444",
-                            monthTextColor: "#1b18b6",
-                            textMonthFontSize: 18,
-                            textMonthFontWeight: "600",
-                            arrowColor: "#1b18b6",
-                            dayTextColor: "#333",
-                            textDisabledColor: "#CCC",
-                            todayTextColor: "#1b18b6",
-                            todayBackgroundColor: "#E8F0FE",
-                            selectedDayBackgroundColor: showCalendar === "start" ? "#1b18b6" : "#f54b64",
-                            selectedDayTextColor: "#fff",
-                            dotColor: "#1b18b6",
-                            selectedDotColor: "#fff",
-                            textDayFontSize: 16,
-                            textDayFontWeight: "500",
-                            textDayHeaderFontSize: 14,
-                            textDayHeaderFontWeight: "500",
                           }}
                           hideExtraDays={false}
                           firstDay={1}
-                          enableSwipeMonths
                         />
                       </View>
-
                     </View>
                   )}
 
@@ -427,7 +395,6 @@ export default function CalendarComponent({
                     onFocus={() => setShowCalendar("deadline")}
                   />
 
-                  {/* Calendar pentru Deadline */}
                   {showCalendar === "deadline" && (
                     <View
                       style={{
@@ -448,43 +415,9 @@ export default function CalendarComponent({
                           ...(taskData.deadline
                             ? { [taskData.deadline]: { selected: true, selectedColor: "#f54b64" } }
                             : {}),
-                          ...(taskData.startDate && taskData.startDate !== taskData.deadline
-                            ? {
-                              [taskData.startDate]: {
-                                selected: true, selectedColor: "#1b18b6", textColor: "#fff", customStyles: {
-                                  container: {
-                                    borderWidth: 1,
-                                    borderColor: "#1b18b6",
-                                    borderRadius: 6,
-                                  },
-                                  text: { fontWeight: "600", fontSize: 12 }
-                                }
-                              }
-                            }
-                            : {}),
-                        }}
-                        markingType="custom"
-                        theme={{
-                          backgroundColor: "#FAFAFA",
-                          calendarBackground: "#FAFAFA",
-                          textSectionTitleColor: "#444",
-                          monthTextColor: "#1b18b6",
-                          textMonthFontSize: 18,
-                          textMonthFontWeight: "600",
-                          arrowColor: "#1b18b6",
-                          dayTextColor: "#333",
-                          textDisabledColor: "#CCC",
-                          todayTextColor: "#1b18b6",
-                          todayBackgroundColor: "#E8F0FE",
-                          selectedDayTextColor: "#fff",
-                          textDayFontSize: 16,
-                          textDayFontWeight: "500",
-                          textDayHeaderFontSize: 14,
-                          textDayHeaderFontWeight: "500",
                         }}
                         hideExtraDays={false}
                         firstDay={1}
-                        enableSwipeMonths
                       />
                     </View>
                   )}
@@ -506,33 +439,36 @@ export default function CalendarComponent({
                       <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    {/* ADD TASK */}
                     <TouchableOpacity onPress={addTask} activeOpacity={0.9}>
                       <LinearGradient
                         colors={["#1b18b6", "#2063f4", "#2420f9"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={{
-                          flexDirection: "row", 
-                          alignItems: "center", 
+                          flexDirection: "row",
+                          alignItems: "center",
                           justifyContent: "center",
                           padding: 12,
                           borderRadius: 12,
                           marginTop: 12,
                         }}
                       >
-                          <Ionicons name="add-circle-outline" size={22} color="white" style={{ marginRight: 8 }} />
-                          <Text
-                            style={{
-                              color: "white",
-                              fontWeight: "600",
-                              fontSize: 16,
-                              letterSpacing: 0.5,
-                              textAlign: "center",
-                            }}
-                          >
-                            Add Task
-                          </Text>
+                        <Ionicons
+                          name="add-circle-outline"
+                          size={22}
+                          color="white"
+                          style={{ marginRight: 8 }}
+                        />
+                        <Text
+                          style={{
+                            color: "white",
+                            fontWeight: "600",
+                            fontSize: 16,
+                            textAlign: "center",
+                          }}
+                        >
+                          Add Task
+                        </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
