@@ -323,14 +323,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+ 
   headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
   headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
   headerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 12, marginTop: 4, textAlign: "center" },

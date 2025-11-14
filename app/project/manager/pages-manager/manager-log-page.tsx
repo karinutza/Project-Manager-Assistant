@@ -262,6 +262,23 @@ export default function ManagerLogPage(): React.ReactElement {
           </TouchableOpacity>
         </LinearGradient>
 
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
+          />
+        )}
+
         {/* MENIUL, SCOAS DIN TOOLBAR */}
         {open && (
           <BurgerMenu closeMenu={() => setOpen(false)} />
@@ -396,7 +413,15 @@ export default function ManagerLogPage(): React.ReactElement {
             <Text style={styles.sectionTitle}>Project Deadlines</Text>
             <Text style={styles.sectionSubtitle}>Upcoming tasks and milestones</Text>
           </View>
-          <View style={styles.calendarWrapper}>
+
+          {/* Touchable pentru calendar */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push("/project/manager/pages-manager/calendar-deadlines-page")
+            }
+            style={styles.calendarWrapper} // păstrăm stilul calendarWrapper
+          >
             <Calendar
               markingType="multi-dot"
               markedDates={markedDates}
@@ -413,7 +438,7 @@ export default function ManagerLogPage(): React.ReactElement {
               }}
               style={{ borderRadius: 12 }}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -468,14 +493,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
   headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
   headerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 12, marginTop: 4, textAlign: "center" },
