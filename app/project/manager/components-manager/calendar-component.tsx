@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import dayjs from "dayjs";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
   ScrollView,
   Text,
@@ -32,7 +34,7 @@ type Props = {
   departmentColors: Record<string, string>;
   textColorForBg: (hex: string) => string;
   styles: any;
-  onTaskAdded?: (task: Task) => void;
+  onTaskAdded?: (task: Task) => void; // ✅ PROPS DEFINIT CORECT
 };
 
 export default function CalendarComponent({
@@ -40,7 +42,7 @@ export default function CalendarComponent({
   departmentColors,
   textColorForBg,
   styles,
-  onTaskAdded,
+  onTaskAdded, // ✅ SCOS DIN PROPS
 }: Props) {
   const today = dayjs();
   const [tasks, setTasks] = useState<Task[]>(initialTasks ?? []);
@@ -93,7 +95,13 @@ export default function CalendarComponent({
       progress: taskData.progress,
     };
 
+    // ✅ adaugă task în lista locală
     setTasks((prev) => [...prev, newTask]);
+
+    // ✅ trimite task-ul în parent dacă există un callback
+    onTaskAdded?.(newTask);
+
+    // reset modal
     setTaskData({
       name: "",
       description: "",
@@ -106,7 +114,7 @@ export default function CalendarComponent({
     setShowModal(false);
     setShowCalendar(null);
     setWarning("");
-    onTaskAdded?.(newTask);
+
     Alert.alert("Task added!", `${newTask.name} - ${firstDept}`);
   };
 
