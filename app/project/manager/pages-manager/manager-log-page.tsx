@@ -247,18 +247,11 @@ export default function ManagerLogPage(): React.ReactElement {
       {/* Header */}
       <LinearGradient colors={["#2962FF", "#4FC3F7"]} start={[0, 0]} end={[1, 0]} style={styles.headerGradient}>
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
-            <Ionicons name="menu" size={20} color="#fff" />
-          </TouchableOpacity>
 
           <View style={styles.headerTitleWrap}>
             <Text style={styles.headerTitle}>Manager Log</Text>
             <Text style={styles.headerSubtitle}>Overview & deadlines</Text>
           </View>
-
-          <TouchableOpacity style={styles.iconButton} onPress={() => { /* refresh action if needed */ }}>
-            <Ionicons name="refresh" size={18} color="#fff" />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.headerKpiRow}>
