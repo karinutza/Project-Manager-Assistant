@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Toolbar from "../components-manager/toolbar-manager";
 import { TouchableOpacity } from "react-native";
 import { router } from "expo-router";
+import { useState } from "react";
+import BurgerMenu from "./burger-menu-manager";
 
 type Task = {
   id: number;
@@ -54,12 +56,71 @@ export default function ProjectPlanner() {
   const screenWidth = Dimensions.get("window").width;
   const dayWidth = 10;
   const chartWidth = totalDays * dayWidth + 100;
+  const [open, setOpen] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Toolbar />
+      {/* Wrapper general */}
+      <View style={{ position: "relative" }}>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* HEADER TOOLBAR */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 1]}
+          style={styles.toolbarContainer}
+        >
+          {/* Grup stânga: burger + back */}
+          <View style={{ flexDirection: "row" }}>
+            {/* BUTON BURGER */}
+            <TouchableOpacity
+              style={[styles.iconButton, { marginRight: 8 }]} // padding între burger și back
+              onPress={() => setOpen(true)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="menu" size={24} color="#fff" />
+            </TouchableOpacity>
+
+            {/* BACK */}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="arrow-back" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Grup dreapta: refresh */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => { }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="refresh" size={18} color="#fff" />
+          </TouchableOpacity>
+        </LinearGradient>
+
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
+          />
+        )}
+
+        {/* MENIUL BURGER */}
+        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+
         {/* HEADER */}
         <LinearGradient
           colors={["#2962FF", "#4FC3F7"]}
@@ -68,14 +129,6 @@ export default function ProjectPlanner() {
           style={styles.headerGradient}
         >
           <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => router.back()}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="arrow-back" size={18} color="#fff" />
-            </TouchableOpacity>
-
             <View style={styles.headerTitleWrap}>
               <Text style={styles.headerTitle}>Project Gantt Planner</Text>
               <Text style={styles.headerSubtitle}>Visual project timeline overview</Text>
@@ -102,7 +155,10 @@ export default function ProjectPlanner() {
             </View>
           </View>
         </LinearGradient>
+      </View>
 
+
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* CONTENT CARD */}
         <View style={styles.contentWrap}>
           <View style={styles.card}>
@@ -225,11 +281,37 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F6F7FB" },
   scrollContainer: { paddingBottom: 120 },
 
-  /* HEADER */
-  headerGradient: {
-    paddingTop: 44,
-    paddingBottom: 18,
+  /*TOOLBAR*/
+  toolbarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8
+  },
+
+  /* Header gradient */
+  headerGradient: {
+    paddingTop: 20,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     marginBottom: 12,
@@ -237,8 +319,8 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",

@@ -17,6 +17,7 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaFrameContext, SafeAreaView } from "react-native-safe-area-context";
 
 type Task = {
   name?: string;
@@ -78,6 +79,8 @@ export default function AnalyticsColor(): React.ReactElement {
   const completedTasks = tasks.filter((t) => t.progress === 100).length;
   const inProgressTasks = tasks.filter((t) => (t.progress ?? 0) > 0 && (t.progress ?? 0) < 100).length;
   const overdueTasks = 0; // placeholder
+  const [open, setOpen] = useState(false);
+
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -96,52 +99,73 @@ export default function AnalyticsColor(): React.ReactElement {
   }
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={["#2962FF", "#4FC3F7"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={styles.toolbarContainer}
-      >
-        {/* Container pentru butoanele home + back */}
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="menu" size={20} color="#fff" />
-          </TouchableOpacity>
+    <SafeAreaView>
+      {/* Wrapper general */}
+      <View style={{ position: "relative" }}>
 
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="arrow-back" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Restul elementelor */}
-        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
-
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => {
-            /* refresh action if needed */
-          }}
-        >
-          <Ionicons name="refresh" size={18} color="#fff" />
-        </TouchableOpacity>
-      </LinearGradient>
-
-
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header - gradient card */}
+        {/* HEADER TOOLBAR */}
         <LinearGradient
           colors={["#2962FF", "#4FC3F7"]}
           start={[0, 0]}
           end={[1, 1]}
+          style={styles.toolbarContainer}>
+
+          {/* Grup stânga: burger + back */}
+          <View style={{ flexDirection: "row" }}>
+            {/* BUTON BURGER */}
+            <TouchableOpacity
+              style={[styles.iconButton, { marginRight: 8 }]} // padding între burger și back
+              onPress={() => setOpen(true)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="menu" size={24} color="#fff" />
+            </TouchableOpacity>
+
+            {/* BACK */}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="arrow-back" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Grup dreapta: refresh */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => { }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="refresh" size={18} color="#fff" />
+          </TouchableOpacity>
+        </LinearGradient>
+
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
+          />
+        )}
+
+        {/* MENIUL BURGER */}
+        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+
+        {/* Header - gradient card */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 0]}
           style={styles.headerGradient}
         >
           <View style={styles.headerRow}>
@@ -171,181 +195,184 @@ export default function AnalyticsColor(): React.ReactElement {
           </View>
         </LinearGradient>
 
-        {/* Main content */}
-        <View style={styles.contentWrap}>
-          {/* Left: progress + KPI */}
-          <View style={styles.row}>
-            <View style={styles.progressCard}>
-              <Text style={styles.sectionTitle}>Overall Completion</Text>
-              <View style={styles.ringWrap}>
-                <View style={styles.ringOuter}>
-                  <View style={[styles.ringFill, { height: `${progressPercent}%` }]} />
-                  <Text style={styles.ringLabel}>{progressPercent}%</Text>
+
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Main content */}
+          <View style={styles.contentWrap}>
+            {/* Left: progress + KPI */}
+            <View style={styles.row}>
+              <View style={styles.progressCard}>
+                <Text style={styles.sectionTitle}>Overall Completion</Text>
+                <View style={styles.ringWrap}>
+                  <View style={styles.ringOuter}>
+                    <View style={[styles.ringFill, { height: `${progressPercent}%` }]} />
+                    <Text style={styles.ringLabel}>{progressPercent}%</Text>
+                  </View>
+                </View>
+                <Text style={styles.progressHint}>Average completion across all tasks</Text>
+              </View>
+
+              <View style={styles.kpiColumn}>
+                <View style={[styles.kpiCard, styles.kpiCardPrimary]}>
+                  <View style={styles.kpiIconWrap}>
+                    <Ionicons name="checkmark-circle" size={22} color="#fff" />
+                  </View>
+                  <Text style={styles.kpiNum}>{completedTasks}</Text>
+                  <Text style={styles.kpiText}>Completed</Text>
+                </View>
+
+                <View style={[styles.kpiCard, styles.kpiCardAccent]}>
+                  <View style={styles.kpiIconWrap}>
+                    <Ionicons name="timer" size={22} color="#fff" />
+                  </View>
+                  <Text style={styles.kpiNum}>{inProgressTasks}</Text>
+                  <Text style={styles.kpiText}>In Progress</Text>
+                </View>
+
+                <View style={[styles.kpiCard, styles.kpiCardWarn]}>
+                  <View style={styles.kpiIconWrap}>
+                    <Ionicons name="alert-circle" size={22} color="#fff" />
+                  </View>
+                  <Text style={styles.kpiNum}>{overdueTasks}</Text>
+                  <Text style={styles.kpiText}>Overdue</Text>
                 </View>
               </View>
-              <Text style={styles.progressHint}>Average completion across all tasks</Text>
             </View>
 
-            <View style={styles.kpiColumn}>
-              <View style={[styles.kpiCard, styles.kpiCardPrimary]}>
-                <View style={styles.kpiIconWrap}>
-                  <Ionicons name="checkmark-circle" size={22} color="#fff" />
-                </View>
-                <Text style={styles.kpiNum}>{completedTasks}</Text>
-                <Text style={styles.kpiText}>Completed</Text>
-              </View>
-
-              <View style={[styles.kpiCard, styles.kpiCardAccent]}>
-                <View style={styles.kpiIconWrap}>
-                  <Ionicons name="timer" size={22} color="#fff" />
-                </View>
-                <Text style={styles.kpiNum}>{inProgressTasks}</Text>
-                <Text style={styles.kpiText}>In Progress</Text>
-              </View>
-
-              <View style={[styles.kpiCard, styles.kpiCardWarn]}>
-                <View style={styles.kpiIconWrap}>
-                  <Ionicons name="alert-circle" size={22} color="#fff" />
-                </View>
-                <Text style={styles.kpiNum}>{overdueTasks}</Text>
-                <Text style={styles.kpiText}>Overdue</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Modal pentru filtre */}
-          <Modal
-            transparent
-            visible={filterVisible}
-            animationType="fade"
-            onRequestClose={() => setFilterVisible(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.filterModal}>
-                <Text style={styles.filterTitle}>Filter Tasks</Text>
-                {["All", "Completed", "In Progress", "Overdue"].map((filter) => (
-                  <TouchableOpacity
-                    key={filter}
-                    onPress={() => handleFilterSelect(filter)}
-                    style={[
-                      styles.filterOption,
-                      activeFilter === filter && styles.filterOptionActive,
-                    ]}
-                  >
-                    <Text
+            {/* Modal pentru filtre */}
+            <Modal
+              transparent
+              visible={filterVisible}
+              animationType="fade"
+              onRequestClose={() => setFilterVisible(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.filterModal}>
+                  <Text style={styles.filterTitle}>Filter Tasks</Text>
+                  {["All", "Completed", "In Progress", "Overdue"].map((filter) => (
+                    <TouchableOpacity
+                      key={filter}
+                      onPress={() => handleFilterSelect(filter)}
                       style={[
-                        styles.filterOptionText,
-                        activeFilter === filter && styles.filterOptionTextActive,
+                        styles.filterOption,
+                        activeFilter === filter && styles.filterOptionActive,
                       ]}
                     >
-                      {filter}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          styles.filterOptionText,
+                          activeFilter === filter && styles.filterOptionTextActive,
+                        ]}
+                      >
+                        {filter}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
 
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setFilterVisible(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Task list */}
+            <View style={styles.taskListWrap}>
+              <View style={styles.taskListHeader}>
+                <Text style={styles.sectionTitle}>Tasks Overview</Text>
                 <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setFilterVisible(false)}
+                  style={styles.smallAction}
+                  onPress={() => setFilterVisible(true)}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Ionicons name="filter" size={16} color="#2962FF" />
+                  <Text style={styles.smallActionText}>Filter</Text>
+                </TouchableOpacity>
+              </View>
+
+              {tasks.length === 0 ? (
+                <View style={styles.emptyRow}>
+                  <Text style={styles.emptyText}>No tasks available</Text>
+                </View>
+              ) : (
+                tasks.map((task, idx) => (
+                  <View key={idx} style={styles.taskCard}>
+                    <View style={styles.taskTopRow}>
+                      <View style={styles.taskTitleWrap}>
+                        <Text style={styles.taskTitle}>{task.name}</Text>
+                        <Text style={styles.taskDept}>{task.department}</Text>
+                      </View>
+
+                      <View style={styles.taskActions}>
+                        <TouchableOpacity
+                          style={styles.iconAction}
+                          onPress={() => openEditModal(idx)}
+                        >
+                          <Ionicons name="pencil" size={16} color="#374151" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.iconAction, { marginLeft: 8 }]}
+                          onPress={() => {
+                            // quick mark done toggle example
+                            const updated = [...tasks];
+                            updated[idx] = { ...updated[idx], progress: 100 };
+                            setTasks(updated);
+                          }}
+                        >
+                          <Ionicons name="checkmark" size={16} color="#10B981" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={styles.progressBar}>
+                      <View style={[styles.progressFill, { width: `${task.progress ?? 0}%` }]} />
+                    </View>
+
+                    <View style={styles.taskBottomRow}>
+                      <Text style={styles.taskProgressLabel}>{task.progress ?? 0}%</Text>
+                      <Text style={styles.taskNote} numberOfLines={2}>
+                        {task.description ?? ""}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Edit modal */}
+        <Modal visible={editModalVisible} transparent animationType="slide" onRequestClose={() => setEditModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Edit Task Note</Text>
+              <Text style={styles.modalTaskName}>
+                {selectedTaskIndex !== null ? tasks[selectedTaskIndex]?.name : ""}
+              </Text>
+
+              <TextInput
+                style={styles.modalInput}
+                value={taskNote}
+                onChangeText={setTaskNote}
+                multiline
+                placeholder="Write important details for this task"
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.modalButtonGhost}>
+                  <Text style={styles.modalButtonGhostText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={saveTaskNote} style={styles.modalButtonPrimary}>
+                  <Text style={styles.modalButtonPrimaryText}>Save</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </Modal>
-
-          {/* Task list */}
-          <View style={styles.taskListWrap}>
-            <View style={styles.taskListHeader}>
-              <Text style={styles.sectionTitle}>Tasks Overview</Text>
-              <TouchableOpacity
-                style={styles.smallAction}
-                onPress={() => setFilterVisible(true)}
-              >
-                <Ionicons name="filter" size={16} color="#2962FF" />
-                <Text style={styles.smallActionText}>Filter</Text>
-              </TouchableOpacity>
-            </View>
-
-            {tasks.length === 0 ? (
-              <View style={styles.emptyRow}>
-                <Text style={styles.emptyText}>No tasks available</Text>
-              </View>
-            ) : (
-              tasks.map((task, idx) => (
-                <View key={idx} style={styles.taskCard}>
-                  <View style={styles.taskTopRow}>
-                    <View style={styles.taskTitleWrap}>
-                      <Text style={styles.taskTitle}>{task.name}</Text>
-                      <Text style={styles.taskDept}>{task.department}</Text>
-                    </View>
-
-                    <View style={styles.taskActions}>
-                      <TouchableOpacity
-                        style={styles.iconAction}
-                        onPress={() => openEditModal(idx)}
-                      >
-                        <Ionicons name="pencil" size={16} color="#374151" />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.iconAction, { marginLeft: 8 }]}
-                        onPress={() => {
-                          // quick mark done toggle example
-                          const updated = [...tasks];
-                          updated[idx] = { ...updated[idx], progress: 100 };
-                          setTasks(updated);
-                        }}
-                      >
-                        <Ionicons name="checkmark" size={16} color="#10B981" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${task.progress ?? 0}%` }]} />
-                  </View>
-
-                  <View style={styles.taskBottomRow}>
-                    <Text style={styles.taskProgressLabel}>{task.progress ?? 0}%</Text>
-                    <Text style={styles.taskNote} numberOfLines={2}>
-                      {task.description ?? ""}
-                    </Text>
-                  </View>
-                </View>
-              ))
-            )}
           </View>
-        </View>
-      </ScrollView>
-
-      {/* Edit modal */}
-      <Modal visible={editModalVisible} transparent animationType="slide" onRequestClose={() => setEditModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Edit Task Note</Text>
-            <Text style={styles.modalTaskName}>
-              {selectedTaskIndex !== null ? tasks[selectedTaskIndex]?.name : ""}
-            </Text>
-
-            <TextInput
-              style={styles.modalInput}
-              value={taskNote}
-              onChangeText={setTaskNote}
-              multiline
-              placeholder="Write important details for this task"
-            />
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.modalButtonGhost}>
-                <Text style={styles.modalButtonGhostText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={saveTaskNote} style={styles.modalButtonPrimary}>
-                <Text style={styles.modalButtonPrimaryText}>Save</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </SafeAreaView >
   );
 }
 

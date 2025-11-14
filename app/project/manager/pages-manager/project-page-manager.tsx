@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CalendarComponent from "../components-manager/calendar-component";
 import OverviewNotesComponent from "../components-manager/overview-notes-component";
 import StatusCards from "../components-manager/status-cards";
+import BurgerMenu from "./burger-menu-manager";
 
 export default function ProjectPageManager(): React.ReactElement {
   const params = useLocalSearchParams();
@@ -53,6 +54,7 @@ export default function ProjectPageManager(): React.ReactElement {
   const [notes, setNotes] = useState<
     { id: string; text: string; date: string; checked?: boolean }[]
   >([]);
+  const [open, setOpen] = useState(false);
 
   const today = dayjs();
 
@@ -94,7 +96,6 @@ export default function ProjectPageManager(): React.ReactElement {
       ];
     });
   }
-
   const inProgress = tasks.filter(
     (t) => dayjs(t.deadline).isAfter(today) && !t.done
   );
@@ -102,74 +103,104 @@ export default function ProjectPageManager(): React.ReactElement {
     (t) => dayjs(t.deadline).isBefore(today) && !t.done
   );
   const done = tasks.filter((t) => t.done);
+  const projects = project ? [project] : [];
+  const progressPercent = tasks.length ? Math.round((done.length / tasks.length) * 100) : 0;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 🔷 UN SINGUR HEADER COMPLET */}
-      <LinearGradient
-        colors={["#2962FF", "#4FC3F7"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={styles.headerGradient}
-      >
-        {/* 🔹 Toolbarul: meniul, back și refresh în linie */}
-        <View style={styles.toolbarRow}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+      {/* Wrapper general */}
+      <View style={{ position: "relative" }}>
+
+        {/* HEADER TOOLBAR */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 1]}
+          style={styles.toolbarContainer}
+        >
+          {/* Grup stânga: burger + back */}
+          <View style={{ flexDirection: "row" }}>
+            {/* BUTON BURGER */}
             <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => router.back()}
+              style={[styles.iconButton, { marginRight: 8 }]} // padding între burger și back
+              onPress={() => setOpen(true)}
               activeOpacity={0.8}
             >
-              <Ionicons name="menu" size={20} color="#fff" />
+              <Ionicons name="menu" size={24} color="#fff" />
             </TouchableOpacity>
 
+            {/* BACK */}
             <TouchableOpacity
               style={styles.iconButton}
-              onPress={() =>
-                router.push(
-                  "/project/manager/pages-manager/manager-log-page"
-                )
-              }
+              onPress={() => router.push("/project/manager/pages-manager/manager-log-page")}
               activeOpacity={0.8}
             >
               <Ionicons name="arrow-back" size={18} color="#fff" />
             </TouchableOpacity>
           </View>
 
+          {/* Grup dreapta: refresh */}
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => {
-              /* refresh logic if needed */
-            }}
+            onPress={() => { }}
+            activeOpacity={0.8}
           >
             <Ionicons name="refresh" size={18} color="#fff" />
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
 
-        {/* 🔹 Titlu + Descriere proiect */}
-        <View style={styles.headerRow}>
-          <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>{project.name}</Text>
-            <Text style={styles.headerSubtitle}>{project.description}</Text>
-          </View>
-        </View>
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
+          />
+        )}
 
-        {/* 🔹 KPI-uri */}
-        <View style={styles.headerKpiRow}>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>Total Tasks</Text>
-            <Text style={styles.headerKpiValue}>{tasks.length}</Text>
+        {/* MENIUL BURGER */}
+        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+
+        {/* HEADER GRADIENT DE DEDESUBT */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 0]}
+          style={styles.headerGradient}
+        >
+          {/* Titlu + Subtitlu */}
+          <View style={styles.headerRow}>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>{project.name}</Text>
+              <Text style={styles.headerSubtitle}>{project.description}</Text>
+            </View>
           </View>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>In Progress</Text>
-            <Text style={styles.headerKpiValue}>{inProgress.length}</Text>
+
+          {/* KPI ROW */}
+          <View style={styles.headerKpiRow}>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Overall</Text>
+              <Text style={styles.headerKpiValue}>{progressPercent}%</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Projects</Text>
+              <Text style={styles.headerKpiValue}>{projects.length}</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>In Progress</Text>
+              <Text style={styles.headerKpiValue}>{inProgress.length}</Text>
+            </View>
           </View>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>Completed</Text>
-            <Text style={styles.headerKpiValue}>{done.length}</Text>
-          </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      </View>
 
       {/* 🔷 CONȚINUTUL PRINCIPAL */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -246,7 +277,7 @@ export default function ProjectPageManager(): React.ReactElement {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 
@@ -255,12 +286,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F6F7FB" },
   scrollContainer: { paddingBottom: 120, paddingHorizontal: 14 },
 
-  /* TOOLBAR ROW */
-  toolbarRow: {
+  /*TOOLBAR*/
+  toolbarContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
 
   iconButton: {
@@ -270,47 +309,37 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 8,
+    marginRight: 8
   },
 
-  /* HEADER */
+  /* Header gradient */
   headerGradient: {
-    paddingTop: Platform.OS === "ios" ? 44 : 20,
-    paddingBottom: 18,
-    paddingHorizontal: 18,
+    paddingTop: 20,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     marginBottom: 12,
     elevation: 6,
   },
-  headerRow: {
-    flexDirection: "row",
+  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitleWrap: { alignItems: "center" },
-  headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800" },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 13,
-    marginTop: 4,
-    textAlign: "center",
-  },
+  headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
+  headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
+  headerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 12, marginTop: 4, textAlign: "center" },
 
-  headerKpiRow: {
-    flexDirection: "row",
-    marginTop: 12,
-    justifyContent: "space-between",
-    gap: 8,
-  },
+  headerKpiRow: { flexDirection: "row", marginTop: 12, justifyContent: "space-between", gap: 8 },
   headerKpi: { flex: 1, alignItems: "center" },
   headerKpiLabel: { color: "rgba(255,255,255,0.9)", fontSize: 12 },
-  headerKpiValue: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "800",
-    marginTop: 6,
-  },
+  headerKpiValue: { color: "#fff", fontSize: 16, fontWeight: "800", marginTop: 6 },
+
 
   /* SECTIONS */
   section: {
