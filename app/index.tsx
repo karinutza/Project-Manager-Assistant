@@ -12,7 +12,7 @@ export default function Index() {
     } else if (username === "boss" && password === "boss") {
       router.replace("../../project/boss/pages-boss/boss-log-page"); // navighează la Șef Departament
     }
-    else if (username === "worker" && password === "worker") {
+    else if (username === "w" && password === "w") {
       router.replace("../../project/worker/pages-worker/worker-log-page"); // navighează la Șef Departament
     } else {
       alert("Username sau parola greșită!");

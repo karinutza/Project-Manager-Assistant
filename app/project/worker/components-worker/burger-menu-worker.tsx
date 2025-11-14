@@ -18,7 +18,7 @@ export default function BurgerMenu({ closeMenu }: BurgerMenuProps) {
         <Text style={styles.menuItem}>Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleNavigation("/project/worker/pages-worker/community-page-worker")}>
+      <TouchableOpacity onPress={() => handleNavigation("./community-hub-worker")}>
         <Text style={styles.menuItem}>Community</Text>
       </TouchableOpacity>
 
@@ -26,8 +26,12 @@ export default function BurgerMenu({ closeMenu }: BurgerMenuProps) {
         <Text style={styles.menuItem}>Settings</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={closeMenu}>
-        <Text style={[styles.menuItem, { color: "red" }]}>Close Menu</Text>
+      <TouchableOpacity onPress={() => handleNavigation("/project/worker/pages-worker/assistant-page-worker")}>
+        <Text style={styles.menuItem}>Chat-Bot</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleNavigation("/")}>
+        <Text style={[styles.menuItem, { color: "red" }]}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
