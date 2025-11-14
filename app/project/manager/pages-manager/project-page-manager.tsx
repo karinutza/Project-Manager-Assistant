@@ -1,23 +1,22 @@
-// project-page-manager.tsx
-import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Toolbar from "../components-manager/toolbar-manager";
+import CalendarComponent from "../components-manager/calendar-component";
 import OverviewNotesComponent from "../components-manager/overview-notes-component";
 import StatusCards from "../components-manager/status-cards";
-import CalendarComponent from "../components-manager/calendar-component";
+import BurgerMenu from "./burger-menu-manager";
 
 export default function ProjectPageManager(): React.ReactElement {
   const params = useLocalSearchParams();
@@ -55,6 +54,7 @@ export default function ProjectPageManager(): React.ReactElement {
   const [notes, setNotes] = useState<
     { id: string; text: string; date: string; checked?: boolean }[]
   >([]);
+  const [open, setOpen] = useState(false);
 
   const today = dayjs();
 
@@ -90,71 +90,143 @@ export default function ProjectPageManager(): React.ReactElement {
       const updated = prev.map((n) =>
         n.id === noteId ? { ...n, checked: !n.checked } : n
       );
-      return [...updated.filter((n) => !n.checked), ...updated.filter((n) => n.checked)];
+      return [
+        ...updated.filter((n) => !n.checked),
+        ...updated.filter((n) => n.checked),
+      ];
     });
   }
-
-  const inProgress = tasks.filter((t) => dayjs(t.deadline).isAfter(today) && !t.done);
-  const pastDue = tasks.filter((t) => dayjs(t.deadline).isBefore(today) && !t.done);
+  const inProgress = tasks.filter(
+    (t) => dayjs(t.deadline).isAfter(today) && !t.done
+  );
+  const pastDue = tasks.filter(
+    (t) => dayjs(t.deadline).isBefore(today) && !t.done
+  );
   const done = tasks.filter((t) => t.done);
+  const projects = project ? [project] : [];
+  const progressPercent = tasks.length ? Math.round((done.length / tasks.length) * 100) : 0;
 
   return (
     <SafeAreaView style={styles.container}>
-      <Toolbar />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* HEADER CU GRADIENT */}
+      {/* Wrapper general */}
+      <View style={{ position: "relative" }}>
+
+        {/* HEADER TOOLBAR */}
         <LinearGradient
           colors={["#2962FF", "#4FC3F7"]}
           start={[0, 0]}
           end={[1, 1]}
-          style={styles.headerGradient}
+          style={styles.toolbarContainer}
         >
-          <View style={styles.headerRow}>
+          {/* Grup stânga: burger + back */}
+          <View style={{ flexDirection: "row" }}>
+            {/* BUTON BURGER */}
             <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() =>
-                router.push("/project/manager/pages-manager/manager-log-page")
-              }
+              style={[styles.iconButton, { marginRight: 8 }]} // padding între burger și back
+              onPress={() => setOpen(true)}
               activeOpacity={0.8}
             >
-              <Ionicons name="home-outline" size={20} color="#fff" />
+              <Ionicons name="menu" size={24} color="#fff" />
             </TouchableOpacity>
 
-            <View style={styles.headerTitleWrap}>
-              <Text style={styles.headerTitle}>{project.name}</Text>
-              <Text style={styles.headerSubtitle}>
-                {project.description?.trim() ||
-                  "No description provided for this project."}
-              </Text>
-            </View>
-
-            <View style={{ width: 40 }} />
+            {/* BACK */}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => router.push("/project/manager/pages-manager/manager-log-page")}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="arrow-back" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
+
+          {/* Grup dreapta: refresh */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => { }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="refresh" size={18} color="#fff" />
+          </TouchableOpacity>
         </LinearGradient>
 
-        {/* OVERVIEW & NOTES */}
-        <View>
-          <OverviewNotesComponent
-            project={project}
-            tasks={tasks}
-            notes={notes}
-            onAddNote={(note) => setNotes((prev) => [note, ...prev])}
-            onEditNote={(noteId, newText) =>
-              setNotes((prev) =>
-                prev.map((n) => (n.id === noteId ? { ...n, text: newText } : n))
-              )
-            }
-            onToggleNoteChecked={toggleNoteChecked}
-            onAnalyticsPress={() =>
-              router.push("/project/manager/pages-manager/analytics-page")
-            }
-            onOpenTaskSheet={() =>
-              router.push("/project/manager/pages-manager/microsoft-assistant-page")
-            }
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
           />
-        </View>
+        )}
 
-        {/* SCHEDULE / CALENDAR */}
+        {/* MENIUL BURGER */}
+        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+
+        {/* HEADER GRADIENT DE DEDESUBT */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 0]}
+          style={styles.headerGradient}
+        >
+          {/* Titlu + Subtitlu */}
+          <View style={styles.headerRow}>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>{project.name}</Text>
+              <Text style={styles.headerSubtitle}>{project.description}</Text>
+            </View>
+          </View>
+
+          {/* KPI ROW */}
+          <View style={styles.headerKpiRow}>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Overall</Text>
+              <Text style={styles.headerKpiValue}>{progressPercent}%</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Projects</Text>
+              <Text style={styles.headerKpiValue}>{projects.length}</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>In Progress</Text>
+              <Text style={styles.headerKpiValue}>{inProgress.length}</Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </View>
+
+      {/* 🔷 CONȚINUTUL PRINCIPAL */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <OverviewNotesComponent
+          project={project}
+          tasks={tasks}
+          notes={notes}
+          onAddNote={(note) => setNotes((prev) => [note, ...prev])}
+          onEditNote={(noteId, newText) =>
+            setNotes((prev) =>
+              prev.map((n) =>
+                n.id === noteId ? { ...n, text: newText } : n
+              )
+            )
+          }
+          onToggleNoteChecked={toggleNoteChecked}
+          onAnalyticsPress={() =>
+            router.push("/project/manager/pages-manager/analytics-page")
+          }
+          onOpenTaskSheet={() =>
+            router.push(
+              "/project/manager/pages-manager/microsoft-assistant-page"
+            )
+          }
+        />
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📅 Schedule</Text>
           <CalendarComponent
@@ -182,9 +254,7 @@ export default function ProjectPageManager(): React.ReactElement {
           />
         </View>
 
-        {/* STATUS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}></Text>
           <StatusCards
             pastDue={pastDue}
             inProgress={inProgress}
@@ -193,19 +263,21 @@ export default function ProjectPageManager(): React.ReactElement {
             textColorForBg={textColorForBg}
             onMarkDone={(taskId) =>
               setTasks((prev) =>
-                prev.map((t) => (t.id === taskId ? { ...t, done: true } : t))
+                prev.map((t) =>
+                  t.id === taskId ? { ...t, done: true } : t
+                )
               )
             }
             onEditTask={(taskId) => {
               const idx = tasks.findIndex((t) => t.id === taskId);
               if (idx >= 0) {
-                // handle edit logic
+                // edit logic here
               }
             }}
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 
@@ -214,46 +286,53 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F6F7FB" },
   scrollContainer: { paddingBottom: 120, paddingHorizontal: 14 },
 
-  /* HEADER */
-  headerGradient: {
-    paddingTop: Platform.OS === "ios" ? 44 : 20,
-    paddingBottom: 24,
-    paddingHorizontal: 18,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    marginBottom: 14,
-    elevation: 6,
-  },
-  headerRow: {
+  /*TOOLBAR*/
+  toolbarContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
+
   iconButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 8
   },
-  headerTitleWrap: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 10,
+
+  /* Header gradient */
+  headerGradient: {
+    paddingTop: 20,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginBottom: 12,
+    elevation: 6,
   },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "800",
-    textAlign: "center",
-  },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.9)",
-    fontSize: 13,
-    marginTop: 4,
-    textAlign: "center",
-  },
+  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+ 
+  headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
+  headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
+  headerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 12, marginTop: 4, textAlign: "center" },
+
+  headerKpiRow: { flexDirection: "row", marginTop: 12, justifyContent: "space-between", gap: 8 },
+  headerKpi: { flex: 1, alignItems: "center" },
+  headerKpiLabel: { color: "rgba(255,255,255,0.9)", fontSize: 12 },
+  headerKpiValue: { color: "#fff", fontSize: 16, fontWeight: "800", marginTop: 6 },
+
 
   /* SECTIONS */
   section: {

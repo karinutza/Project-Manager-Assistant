@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+
 
 export default function Toolbar() {
   const [open, setOpen] = useState(false);
@@ -21,8 +21,6 @@ export default function Toolbar() {
       >
         <Ionicons name="menu-outline" size={28} color="#fff" />
       </TouchableOpacity>
-
-      
     </LinearGradient>
   );
 }

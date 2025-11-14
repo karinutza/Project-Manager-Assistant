@@ -16,18 +16,8 @@ import {
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toolbar from "../components-manager/toolbar-manager";
+import BurgerMenu from "./burger-menu-manager";
 
-const MyCalendarScreen = ({ navigation }) => {
-  return (
-    <View>
-      <Calendar
-        onDayPress={() => navigation.goBack()}
-      /* restul props */
-      />
-    </View>
-  );
-};
 
 
 
@@ -190,6 +180,9 @@ export default function ManagerLogPage(): React.ReactElement {
       ];
   }, [projects]);
 
+  const [open, setOpen] = useState(false);
+
+
   // KPIs
   const progressPercent = projects.length
     ? Math.round(projects.reduce((acc, t) => acc + (t.progress ?? 0), 0) / projects.length)
@@ -242,40 +235,86 @@ export default function ManagerLogPage(): React.ReactElement {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Toolbar />
+      {/* Wrapper general */}
+      <View style={{ position: "relative" }}>
 
-      {/* Header */}
-      <LinearGradient colors={["#2962FF", "#4FC3F7"]} start={[0, 0]} end={[1, 0]} style={styles.headerGradient}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
-            <Ionicons name="menu" size={20} color="#fff" />
+        {/* HEADER TOOLBAR */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 1]}
+          style={styles.toolbarContainer}
+        >
+          {/* BUTON BURGER */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => setOpen(true)}
+          >
+            <Ionicons name="menu" size={24} color="#fff" />
           </TouchableOpacity>
 
-          <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>Manager Log</Text>
-            <Text style={styles.headerSubtitle}>Overview & deadlines</Text>
-          </View>
-
-          <TouchableOpacity style={styles.iconButton} onPress={() => { /* refresh action if needed */ }}>
+          {/* REFRESH */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => { }}
+          >
             <Ionicons name="refresh" size={18} color="#fff" />
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
 
-        <View style={styles.headerKpiRow}>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>Overall</Text>
-            <Text style={styles.headerKpiValue}>{progressPercent}%</Text>
+        {/* OVERLAY PENTRU ÎNCHIDERE BURGER */}
+        {open && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "transparent",
+              zIndex: 1,
+            }}
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
+          />
+        )}
+
+        {/* MENIUL, SCOAS DIN TOOLBAR */}
+        {open && (
+          <BurgerMenu closeMenu={() => setOpen(false)} />
+        )}
+
+        {/* HEADER GRADIENT DE DEDESUBT */}
+        <LinearGradient
+          colors={["#2962FF", "#4FC3F7"]}
+          start={[0, 0]}
+          end={[1, 0]}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerRow}>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>Manager Log</Text>
+              <Text style={styles.headerSubtitle}>Overview & deadlines</Text>
+            </View>
           </View>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>Projects</Text>
-            <Text style={styles.headerKpiValue}>{projects.length}</Text>
+
+          <View style={styles.headerKpiRow}>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Overall</Text>
+              <Text style={styles.headerKpiValue}>{progressPercent}%</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>Projects</Text>
+              <Text style={styles.headerKpiValue}>{projects.length}</Text>
+            </View>
+            <View style={styles.headerKpi}>
+              <Text style={styles.headerKpiLabel}>In Progress</Text>
+              <Text style={styles.headerKpiValue}>{inProgress}</Text>
+            </View>
           </View>
-          <View style={styles.headerKpi}>
-            <Text style={styles.headerKpiLabel}>In Progress</Text>
-            <Text style={styles.headerKpiValue}>{inProgress}</Text>
-          </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+
+      </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         {/* Overview */}
@@ -374,7 +413,15 @@ export default function ManagerLogPage(): React.ReactElement {
             <Text style={styles.sectionTitle}>Project Deadlines</Text>
             <Text style={styles.sectionSubtitle}>Upcoming tasks and milestones</Text>
           </View>
-          <View style={styles.calendarWrapper}>
+
+          {/* Touchable pentru calendar */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push("/project/manager/pages-manager/calendar-deadlines-page")
+            }
+            style={styles.calendarWrapper} // păstrăm stilul calendarWrapper
+          >
             <Calendar
               markingType="multi-dot"
               markedDates={markedDates}
@@ -391,7 +438,7 @@ export default function ManagerLogPage(): React.ReactElement {
               }}
               style={{ borderRadius: 12 }}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -409,6 +456,32 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F6F7FB" },
   scrollContainer: { paddingBottom: 100, paddingTop: 6 },
 
+  /*TOOLBAR*/
+  toolbarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8
+  },
+
   /* Header gradient */
   headerGradient: {
     paddingTop: 20,
@@ -420,14 +493,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
   headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
   headerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 12, marginTop: 4, textAlign: "center" },
