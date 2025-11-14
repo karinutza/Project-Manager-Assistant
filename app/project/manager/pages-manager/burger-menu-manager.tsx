@@ -1,58 +1,107 @@
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 type BurgerMenuProps = {
-  closeMenu?: () => void; // <-- adăugăm prop-ul
+  closeMenu?: () => void;
 };
 
 export default function BurgerMenu({ closeMenu }: BurgerMenuProps) {
   const handleNavigation = (path: Parameters<typeof router.push>[0]) => {
     router.push(path);
-    if (closeMenu) closeMenu(); // închidem meniul după navigare
+    closeMenu?.();
   };
 
   return (
-    <View style={styles.menu}>
-      <TouchableOpacity onPress={() => handleNavigation("/project/manager/pages-manager/user-profile-manager")}>
-        <Text style={styles.menuItem}>Profile</Text>
-      </TouchableOpacity>
+    <View style={styles.menuWrapper}>
+      <View style={styles.menuCard}>
+        <MenuItem
+          icon="person-circle-outline"
+          label="Profile"
+          onPress={() =>
+            handleNavigation("/project/manager/pages-manager/user-profile-manager")
+          }
+        />
 
-      <TouchableOpacity onPress={() => handleNavigation("/project/manager/pages-manager/community-page-manager")}>
-        <Text style={styles.menuItem}>Community</Text>
-      </TouchableOpacity>
+        <MenuItem
+          icon="people-outline"
+          label="Community"
+          onPress={() => handleNavigation("./community-hub-manager")}
+        />
 
-      <TouchableOpacity onPress={() => handleNavigation("/project/manager/pages-manager/settings-page-manager")}>
-        <Text style={styles.menuItem}>Settings</Text>
-      </TouchableOpacity>
+        <View style={styles.separator} />
 
-      <TouchableOpacity onPress={closeMenu}>
-        <Text style={[styles.menuItem, { color: "red" }]}>Close Menu</Text>
-      </TouchableOpacity>
+        <MenuItem
+          icon="log-out-outline"
+          label="Logout"
+          labelColor="#E53935"
+          onPress={() => handleNavigation("/")}
+        />
+      </View>
     </View>
   );
 }
 
+// Componentă mică pentru item, doar ca să fie mai curat
+function MenuItem({
+  icon,
+  label,
+  labelColor = "#1E293B",
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  labelColor?: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity style={styles.itemRow} onPress={onPress}>
+      <Ionicons name={icon} size={18} color={labelColor} />
+      <Text style={[styles.itemText, { color: labelColor }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
-  menu: {
+  menuWrapper: {
     position: "absolute",
-    left: 18,
-    top: 72,
-    width: 180,
-    backgroundColor: "#fff",
+    top: 60,         // mai aproape de toolbar
+    left: 12,
+    zIndex: 999,
+  },
+
+  menuCard: {
+    width: 160,      // redus de la 220
+    backgroundColor: "#ffffff",
     borderRadius: 14,
-    paddingVertical: 6,
-    elevation: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     shadowColor: "#000",
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.12,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 8,
-    zIndex: 200,
+    elevation: 8,
   },
-  menuItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    fontSize: 16,
-    color: "#1E293B",
+
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,     // redus de la 12
+    paddingHorizontal: 10,
+  },
+
+  itemText: {
+    fontSize: 15,     // în loc de 17
+    marginLeft: 10,
+    fontWeight: "500",
+  },
+
+  separator: {
+    height: 1,
+    backgroundColor: "#E2E8F0",
+    width: "90%",
+    alignSelf: "center",
+    marginVertical: 4,
   },
 });
