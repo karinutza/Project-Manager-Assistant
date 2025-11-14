@@ -17,7 +17,7 @@ export default function DepartmentsPage() {
     { id: "3", name: "Carla" },
   ];
 
-  let incomingProjects: Array<any> = [];
+  let incomingProjects: any[] = [];
   try {
     if (params.projects) {
       const parsed = JSON.parse(decodeURIComponent(String(params.projects)));

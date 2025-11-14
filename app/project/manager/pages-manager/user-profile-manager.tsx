@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -15,7 +14,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const STORAGE_KEY = "@pma_user_v1";

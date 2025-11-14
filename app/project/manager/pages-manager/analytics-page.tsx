@@ -1,21 +1,22 @@
 // analytics-color.tsx
-import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import Toolbar from "../components-manager/toolbar-manager";
+import React, { useEffect, useState } from "react";
+import BurgerMenu from "./burger-menu-manager";
 
+
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Dimensions,
   Modal,
-  TextInput,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 type Task = {
   name?: string;
@@ -96,7 +97,44 @@ export default function AnalyticsColor(): React.ReactElement {
 
   return (
     <View style={styles.container}>
-      <Toolbar />
+      <LinearGradient
+        colors={["#2962FF", "#4FC3F7"]}
+        start={[0, 0]}
+        end={[1, 1]}
+        style={styles.toolbarContainer}
+      >
+        {/* Container pentru butoanele home + back */}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => router.back()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="menu" size={20} color="#fff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Restul elementelor */}
+        {open && <BurgerMenu closeMenu={() => setOpen(false)} />}
+
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => {
+            /* refresh action if needed */
+          }}
+        >
+          <Ionicons name="refresh" size={18} color="#fff" />
+        </TouchableOpacity>
+      </LinearGradient>
+
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header - gradient card */}
@@ -107,13 +145,6 @@ export default function AnalyticsColor(): React.ReactElement {
           style={styles.headerGradient}
         >
           <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="arrow-back" size={18} color="#fff" />
-            </TouchableOpacity>
 
             <View style={styles.headerTitleWrap}>
               <Text style={styles.headerTitle}>{project.name}</Text>
@@ -325,6 +356,44 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F6F7FB" },
   scrollContainer: { paddingBottom: 120 },
 
+  /*TOOLBAR*/
+  toolbarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+    borderBottomColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  appName: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 20,
+    letterSpacing: 0.5,
+  },
+  profileImage: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.8)",
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8
+  },
+
   /* HEADER */
   headerGradient: {
     paddingTop: Platform.OS === "ios" ? 44 : 20,
@@ -334,16 +403,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     marginBottom: 12,
     elevation: 6,
+    padding: 5,
   },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   headerTitleWrap: { flex: 1, paddingHorizontal: 12, alignItems: "center" },
   headerTitle: { color: "#fff", fontSize: 20, fontWeight: "800", textAlign: "center" },
   headerSubtitle: { color: "rgba(255,255,255,0.85)", fontSize: 13, marginTop: 4, textAlign: "center" },

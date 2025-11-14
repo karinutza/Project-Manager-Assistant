@@ -19,7 +19,7 @@ export default function CalendarDay() {
     const params = useLocalSearchParams();
     const date = (params.date as string) || undefined;
 
-    let projects: Array<{ id?: string; name?: string; color?: string; deadline?: string }> = [];
+    let projects: { id?: string; name?: string; color?: string; deadline?: string }[] = [];
     if (params.projects) {
         try {
             const parsed = JSON.parse(decodeURIComponent(String(params.projects)));

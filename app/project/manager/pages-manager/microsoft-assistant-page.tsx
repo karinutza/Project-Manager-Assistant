@@ -1,4 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo } from "react";
 import {
   Dimensions,
@@ -6,12 +8,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
 import Toolbar from "../components-manager/toolbar-manager";
-import { TouchableOpacity } from "react-native";
+
 import { router } from "expo-router";
 
 type Task = {
