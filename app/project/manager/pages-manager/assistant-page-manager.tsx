@@ -80,7 +80,7 @@ export default function AssistantPageWorker() {
 
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => router.push("/project/manager/pages-manager/community-hub-manager")}
+            onPress={() => router.push("/project/manager/pages-manager/manager-log-page")}
             activeOpacity={0.8}
           >
             <Ionicons name="arrow-back" size={18} color="#fff" />
