@@ -1,6 +1,15 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ImageBackground, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 
 export default function Index() {
   const [username, setUsername] = useState("");
@@ -8,103 +17,187 @@ export default function Index() {
 
   const handleLogin = () => {
     if (username === "" && password === "") {
-      router.replace("../../project/manager/pages-manager/manager-log-page"); // navighează la Manager
+      router.replace("../../project/manager/pages-manager/manager-log-page");
     } else if (username === "boss" && password === "boss") {
-      router.replace("../../project/boss/pages-boss/boss-log-page"); // navighează la Șef Departament
-    }
-    else if (username === "w" && password === "w") {
-      router.replace("../../project/worker/pages-worker/worker-log-page"); // navighează la Șef Departament
+      router.replace("../../project/boss/pages-boss/boss-log-page");
+    } else if (username === "worker" && password === "worker") {
+      router.replace("../../project/worker/pages-worker/worker-log-page");
     } else {
       alert("Username sau parola greșită!");
     }
   };
 
   return (
-    <ImageBackground
-      source={{ uri: "https://t4.ftcdn.net/jpg/04/43/86/95/360_F_443869511_jd2jaCumkg72bbZnHgP6kquAsU1huenY.jpg" }}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Project Assistant</Text>
-          <Text style={styles.subtitle}>Conectează-te pentru a continua</Text>
+    <SafeAreaView style={styles.container}>
 
-          <TextInput
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            style={styles.input}
-          />
+      {/* FUNDAL GRADIENT */}
+      <LinearGradient
+        colors={["#E4ECFF", "#F3F6FB"]}
+        start={[0, 0]}
+        end={[1, 1]}
+        style={StyleSheet.absoluteFill}
+      />
 
-          <TextInput
-            placeholder="Parolă"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
+      {/* BLOB-uri decorative */}
+      <View style={styles.blobBlue} />
+      <View style={styles.blobCyan} />
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
+      {/* Conținut */}
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <LinearGradient
+            colors={["#2962FF", "#33C1FF"]}
+            style={styles.logoCircle}
+          >
+            <Image
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/512/9068/9068649.png",
+              }}
+              style={styles.logoIcon}
+            />
+          </LinearGradient>
         </View>
-      </SafeAreaView>
-    </ImageBackground>
+
+        <Text style={styles.title}>Project Assistant</Text>
+        <Text style={styles.subtitle}>Gestionare simplă. Decizii rapide.</Text>
+      </View>
+
+      <View style={styles.form}>
+        <TextInput
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+          style={styles.input}
+          placeholderTextColor="#9CA3AF"
+        />
+
+        <TextInput
+          placeholder="Parolă"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor="#9CA3AF"
+        />
+
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+          <LinearGradient
+            colors={["#1b18b6", "#2962FF"]}
+            style={styles.buttonGradient}
+          >
+            <Text style={styles.buttonText}>Continuă</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    padding: 10,
+    paddingHorizontal: 28,
   },
-  card: {
-    width: "100%",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 16,
-    padding: 30,
-    alignItems: "center",
+
+  /* BLOB-URI */
+  blobBlue: {
+    position: "absolute",
+    width: 260,
+    height: 260,
+    backgroundColor: "#2962FF33",
+    borderRadius: 200,
+    top: -40,
+    left: -60,
   },
+
+  blobCyan: {
+    position: "absolute",
+    width: 260,
+    height: 260,
+    backgroundColor: "#33C1FF33",
+    borderRadius: 200,
+    bottom: -50,
+    right: -40,
+  },
+
+  header: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+
+  logoContainer: {
+    marginBottom: 16,
+  },
+
+  logoCircle: {
+    width: 95,
+    height: 95,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+  },
+
+  logoIcon: {
+    width: 54,
+    height: 54,
+    tintColor: "#fff",
+  },
+
   title: {
     fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 8,
+    fontWeight: "800",
+    color: "#1E293B",
   },
+
   subtitle: {
-    fontSize: 16,
-    color: "#6B7280",
-    marginBottom: 24,
+    fontSize: 14,
+    color: "#64748B",
+    marginTop: 3,
   },
+
+  /* CARD MICȘORAT */
+  form: {
+    width: "78%",
+    alignSelf: "center",
+    backgroundColor: "white",
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+
   input: {
     width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    height: 48,
     borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    backgroundColor: "#F9FAFB",
-    fontSize: 16,
-    color: "#111827",
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    backgroundColor: "#F8FAFC",
+    fontSize: 15,
+    color: "#1E293B",
   },
+
   button: {
     width: "100%",
-    backgroundColor: "#2563EB",
-    paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 14,
+    overflow: "hidden",
+    marginTop: 4,
+  },
+
+  buttonGradient: {
+    paddingVertical: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
+
   buttonText: {
     color: "#fff",
     fontWeight: "700",
