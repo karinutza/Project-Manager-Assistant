@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
-import PageFooter from "../project/components/PageFooter";
-import Toolbar from "../project/components/Toolbar";
+import Toolbar from "../components-boss/toolbar-boss";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -67,7 +66,7 @@ export default function AnalyticsPage(): React.ReactElement {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Project Header */}
         <View style={styles.headerSection}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/project/ProjectPage")}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push("/project/boss/pages-boss/project-page-boss")}>
             <Ionicons name="arrow-back" size={18} color="#fff" />
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>
@@ -178,8 +177,7 @@ export default function AnalyticsPage(): React.ReactElement {
         </View>
       </Modal>
 
-      {/* Footer */}
-      <PageFooter />
+      
     </View>
   );
 }
@@ -224,6 +222,6 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
   textArea: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 10, minHeight: 80, textAlignVertical: "top" },
   cancelText: { color: "#888", fontWeight: "600" },
-  saveText: { color: "#1b18b6", fontWeight: "700", fontSize: 25  },
+  saveText: { color: "#1b18b6", fontWeight: "700", fontSize: 25 },
 
 });

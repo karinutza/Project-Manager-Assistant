@@ -1,11 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LinearGradient } from "expo-linear-gradient";
 
-import Toolbar from "../project/components/Toolbar";
-import PageFooter from "../project/components/PageFooter";
+import Toolbar from "../components-worker/toolbar-worker";
 
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -18,7 +15,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const STORAGE_KEY = "@pma_user_v1";
@@ -37,7 +34,7 @@ export default function ProjectUserPage() {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) setUser(JSON.parse(raw));
         else {
-          const seed = { name: "Karina Barbul", email: "karina@example.com", rank: "Pro" };
+          const seed = { name: "Karina Barbul", email: "karina@example.com", rank: "Worker" };
           setUser(seed);
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
         }
@@ -67,16 +64,20 @@ export default function ProjectUserPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Toolbar (matched from HomeScreen but keeps home icon) */}
+      {/* Toolbar */}
       <Toolbar />
 
       {/* Content */}
       <ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
         <View style={styles.profileCard}>
-          <Image source={require("../../assets/user.png")} style={styles.avatar} />
+          {/* Poza de profil sus */}
+          <Image
+            source={require("../../../user.png")} // ajustează calea corect
+            style={styles.profileImage}
+          />
 
           <Text style={styles.userName}>{user?.name}</Text>
-          <Text style={styles.userRank}>{user?.rank} Member</Text>
+          <Text style={styles.userRank}>{user?.rank}</Text>
 
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
@@ -111,9 +112,6 @@ export default function ProjectUserPage() {
         </View>
       </ScrollView>
 
-      {/* Footer */}
-      <PageFooter/>
-
       {/* Edit Modal */}
       <Modal visible={editing} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
@@ -139,6 +137,7 @@ export default function ProjectUserPage() {
                 <TouchableOpacity onPress={() => setEditing(false)}>
                   <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
+                
                 <TouchableOpacity style={styles.saveButton} onPress={save}>
                   <Text style={styles.saveText}>Save</Text>
                 </TouchableOpacity>
@@ -158,13 +157,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    boxShadow: "0px 2px 8px rgba(0,0,0,0.10)",
     alignItems: "center",
   },
-  avatar: { width: 110, height: 110, borderRadius: 55, marginBottom: 10 },
+  profileImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    marginBottom: 16,
+  },
   userName: { fontSize: 20, fontWeight: "700", color: "#0f1724" },
   userRank: { fontSize: 14, color: "#6b7280", marginBottom: 12 },
   statsRow: { flexDirection: "row", justifyContent: "space-around", width: "100%", marginBottom: 18 },

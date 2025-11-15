@@ -1,20 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 
-import Toolbar from "../project/components/Toolbar";
-import PageFooter from "../project/components/PageFooter";
+import Toolbar from "../components-manager/toolbar-manager";
 
 import React from "react";
 import {
     Dimensions,
-    Image,
     SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 
@@ -22,7 +19,7 @@ export default function CalendarDay() {
     const params = useLocalSearchParams();
     const date = (params.date as string) || undefined;
 
-    let projects: Array<{ id?: string; name?: string; color?: string; deadline?: string }> = [];
+    let projects: { id?: string; name?: string; color?: string; deadline?: string }[] = [];
     if (params.projects) {
         try {
             const parsed = JSON.parse(decodeURIComponent(String(params.projects)));
@@ -47,11 +44,11 @@ export default function CalendarDay() {
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 {/* Toolbar */}
-                <Toolbar/>
+                <Toolbar />
 
                 <View style={styles.content}>
                     {/* Full-width Home Button */}
-                    <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/")}>
+                    <TouchableOpacity style={styles.homeButton} onPress={() => router.push("/project/manager/pages-manager/project-page-manager")}>
                         <Ionicons name="arrow-back" size={20} color="#fff" />
                         <Text style={styles.homeButtonText}>Home</Text>
                     </TouchableOpacity>
@@ -155,8 +152,6 @@ export default function CalendarDay() {
 
                     <Text style={styles.footerNote}>Select a date to explore related project tasks.</Text>
                 </View>
-                {/* Footer */}
-                <PageFooter />
             </ScrollView>
         </SafeAreaView>
     );
